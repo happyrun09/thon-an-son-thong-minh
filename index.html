@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>Thôn An Sơn Thông Minh • Xã Cam Lộ, Tỉnh Quảng Trị</title>
+  <meta name="description" content="Cổng thông tin Thôn An Sơn Thông Minh - Xã Cam Lộ, Tỉnh Quảng Trị. Tra cứu thông báo, lịch thôn, danh bạ cán bộ, gửi phản ánh kiến nghị nhanh chóng cho mọi người dân." />
+  <meta name="theme-color" content="#059669" />
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- Font chữ tiếng Việt rõ nét -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Be Vietnam Pro"', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- QR Code Generator Library (nhẹ, không phụ thuộc server) -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast-banner" role="status" aria-live="polite">
+    <span id="toast-icon">✅</span>
+    <span id="toast-text">Đã thực hiện thành công!</span>
+  </div>
+
+  <!-- HEADER CHÍNH (Gradient xanh ngọc - xanh dương giống mẫu chuẩn) -->
+  <header class="hero-header text-white shadow-md">
+    <div class="max-w-5xl mx-auto px-4 pt-3 pb-5 relative z-10">
+      <!-- Hàng trên: Ngày tháng + Nút Cỡ chữ + Nút QR + Ban quản trị -->
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <div class="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm border border-white/20 px-3 py-1 rounded-full text-xs sm:text-sm font-medium">
+          <span>📅</span>
+          <span id="current-date-text">Đang tải ngày...</span>
+        </div>
+
+        <div class="flex items-center gap-1.5 sm:gap-2">
+          <!-- Nút phóng to chữ cho người lớn tuổi -->
+          <button id="btn-font-toggle" onclick="cycleFontSize()" title="Thay đổi cỡ chữ cho dễ đọc"
+            class="inline-flex items-center gap-1 bg-white/15 hover:bg-white/25 border border-white/25 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer">
+            <span>🔎</span>
+            <span id="font-label">Cỡ chữ: Vừa</span>
+          </button>
+
+          <!-- Nút Mã QR -->
+          <button onclick="openQrModal()" title="Xem mã QR của thôn"
+            class="inline-flex items-center justify-center bg-white/15 hover:bg-white/25 border border-white/25 p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+            </svg>
+            <span class="hidden sm:inline ml-1">Mã QR</span>
+          </button>
+
+          <!-- Nút Ban quản trị -->
+          <button onclick="openAdminModal()"
+            class="inline-flex items-center gap-1.5 bg-white/20 hover:bg-white/30 border border-white/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer">
+            <span>🛡️</span>
+            <span id="admin-btn-text">Ban quản trị</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Hàng dưới: Logo + Tên Thôn -->
+      <div class="flex items-center gap-3.5 cursor-pointer" onclick="navigateTo('home')">
+        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shrink-0 shadow-sm">
+          <svg class="w-7 h-7 sm:w-8 sm:h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 3L2 12h3v8h6v-5h2v5h6v-8h3L12 3zm0 2.84L18 11.2V18h-3v-5H9v5H6v-6.8l6-5.36z" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-lg sm:text-2xl font-extrabold tracking-tight leading-snug uppercase">
+            THÔN AN SƠN THÔNG MINH
+          </h1>
+          <p class="text-xs sm:text-sm text-emerald-50 font-medium tracking-wide uppercase opacity-95">
+            XÃ CAM LỘ — TỈNH QUẢNG TRỊ
+          </p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- THANH ĐIỀU HƯỚNG MÁY TÍNH (Ẩn trên điện thoại nhỏ, hiện từ màn hình vừa trở lên) -->
+  <nav class="hidden md:block bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs" aria-label="Điều hướng chính">
+    <div class="max-w-5xl mx-auto px-4 py-2.5 flex items-center justify-between gap-2 overflow-x-auto">
+      <div class="flex items-center gap-1.5">
+        <button class="desktop-nav-btn active" data-nav="home" onclick="navigateTo('home')">🏠 Trang chủ</button>
+        <button class="desktop-nav-btn" data-nav="notices" onclick="navigateTo('notices')">🔔 Thông báo</button>
+        <button class="desktop-nav-btn" data-nav="news" onclick="navigateTo('news')">📰 Tin tức</button>
+        <button class="desktop-nav-btn" data-nav="calendar" onclick="navigateTo('calendar')">📅 Lịch thôn</button>
+        <button class="desktop-nav-btn" data-nav="officials" onclick="navigateTo('officials')">👥 Cán bộ</button>
+        <button class="desktop-nav-btn" data-nav="feedback" onclick="navigateTo('feedback')">💬 Phản ánh</button>
+        <button class="desktop-nav-btn" data-nav="utilities" onclick="navigateTo('utilities')">📱 Tiện ích & QR</button>
+      </div>
+      <a href="tel:113" class="text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1.5 rounded-full shrink-0 transition">
+        🚨 Khẩn cấp: 113 / 114 / 115
+      </a>
+    </div>
+  </nav>
+
+  <!-- NỘI DUNG CHÍNH -->
+  <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-5 space-y-5">
+
+    <!-- ==================== 1. TRANG CHỦ ==================== -->
+    <section id="view-home" class="view-section space-y-5">
+
+      <!-- Thẻ chào mừng & Đăng ký nhận thông báo -->
+      <div class="civic-card p-5 sm:p-6 bg-gradient-to-br from-white to-emerald-50/40">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="space-y-1.5">
+            <span class="inline-block text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-md">
+              Cổng thông tin cộng đồng
+            </span>
+            <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">
+              CHÀO MỪNG BÀ CON ĐẾN VỚI THÔN AN SƠN
+            </h2>
+            <p class="text-sm sm:text-base text-slate-600">
+              Thông tin nhanh chóng – Kết nối cộng đồng – Chung tay xây dựng quê hương.
+            </p>
+          </div>
+          <div class="shrink-0">
+            <button onclick="openSubscribeModal()"
+              class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-emerald-700 hover:bg-emerald-800 active:scale-95 text-white font-bold text-sm px-5 py-3 rounded-xl shadow-sm transition cursor-pointer">
+              <span>🔔</span>
+              <span>ĐĂNG KÝ NHẬN THÔNG BÁO TỪ THÔN</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6 Ô CHỨC NĂNG LỚN (Dễ bấm trên điện thoại & máy tính) -->
+      <div>
+        <div class="grid grid-cols-3 sm:grid-cols-6 gap-3">
+          <button onclick="navigateTo('notices')" class="quick-tile">
+            <span id="home-notice-badge" class="hidden absolute top-2 right-2 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">0</span>
+            <div class="tile-icon-box bg-rose-50 text-rose-600">🔔</div>
+            <span class="text-xs sm:text-sm font-bold text-slate-800">Thông báo</span>
+          </button>
+
+          <button onclick="navigateTo('news')" class="quick-tile">
+            <div class="tile-icon-box bg-emerald-50 text-emerald-600">📰</div>
+            <span class="text-xs sm:text-sm font-bold text-slate-800">Tin tức</span>
+          </button>
+
+          <button onclick="navigateTo('calendar')" class="quick-tile">
+            <div class="tile-icon-box bg-sky-50 text-sky-600">📅</div>
+            <span class="text-xs sm:text-sm font-bold text-slate-800">Lịch thôn</span>
+          </button>
+
+          <button onclick="navigateTo('officials')" class="quick-tile">
+            <div class="tile-icon-box bg-indigo-50 text-indigo-600">👥</div>
+            <span class="text-xs sm:text-sm font-bold text-slate-800">Cán bộ</span>
+          </button>
+
+          <button onclick="navigateTo('feedback')" class="quick-tile">
+            <div class="tile-icon-box bg-amber-50 text-amber-600">💬</div>
+            <span class="text-xs sm:text-sm font-bold text-slate-800">Phản ánh</span>
+          </button>
+
+          <button onclick="navigateTo('utilities')" class="quick-tile">
+            <div class="tile-icon-box bg-teal-50 text-teal-600">ℹ️</div>
+            <span class="text-xs sm:text-sm font-bold text-slate-800">Khác & QR</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Thông báo mới nhất -->
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+            <span>📢</span> Thông báo mới nhất
+          </h3>
+          <button onclick="navigateTo('notices')" class="text-sm font-bold text-emerald-700 hover:text-emerald-800 cursor-pointer">
+            Xem tất cả &rsaquo;
+          </button>
+        </div>
+        <div id="home-latest-notices" class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+          <!-- Render bằng JS -->
+        </div>
+      </div>
+
+      <!-- Sự kiện sắp tới + Gọi nhanh cán bộ -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <!-- Lịch thôn sắp tới -->
+        <div class="civic-card p-5 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-base sm:text-lg font-extrabold text-slate-900 flex items-center gap-2">
+              <span>📅</span> Lịch hoạt động sắp tới
+            </h3>
+            <button onclick="navigateTo('calendar')" class="text-xs sm:text-sm font-bold text-emerald-700 hover:underline cursor-pointer">
+              Chi tiết &rsaquo;
+            </button>
+          </div>
+          <div id="home-upcoming-events" class="space-y-2.5">
+            <!-- Render bằng JS -->
+          </div>
+        </div>
+
+        <!-- Đường dây nóng & Cán bộ trực -->
+        <div class="civic-card p-5 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-base sm:text-lg font-extrabold text-slate-900 flex items-center gap-2">
+              <span>📞</span> Gọi nhanh Ban cán sự thôn
+            </h3>
+            <button onclick="navigateTo('officials')" class="text-xs sm:text-sm font-bold text-emerald-700 hover:underline cursor-pointer">
+              Tất cả &rsaquo;
+            </button>
+          </div>
+          <div id="home-quick-contacts" class="space-y-2.5">
+            <!-- Render bằng JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 2. THÔNG BÁO ==================== -->
+    <section id="view-notices" class="view-section hidden space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 class="text-xl font-extrabold text-slate-900">🔔 Thông báo từ Ban Thôn</h2>
+          <p class="text-sm text-slate-600">Bà con có thể bấm nút 🔊 <strong>Nghe đọc</strong> nếu ngại đọc chữ nhỏ.</p>
+        </div>
+        <input id="notice-search" type="search" placeholder="Tìm thông báo (vd: tiêm chủng, điện, họp...)"
+          oninput="renderNoticesPage()"
+          class="w-full sm:w-72 px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+      </div>
+
+      <!-- Bộ lọc danh mục -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-1">
+        <button class="notice-filter-btn px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold bg-emerald-600 text-white cursor-pointer shrink-0" data-cat="all" onclick="setNoticeFilter('all', this)">Tất cả</button>
+        <button class="notice-filter-btn px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold bg-white border border-slate-300 text-slate-700 cursor-pointer shrink-0" data-cat="urgent" onclick="setNoticeFilter('urgent', this)">🚨 Khẩn cấp</button>
+        <button class="notice-filter-btn px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold bg-white border border-slate-300 text-slate-700 cursor-pointer shrink-0" data-cat="important" onclick="setNoticeFilter('important', this)">⚠️ Quan trọng</button>
+        <button class="notice-filter-btn px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold bg-white border border-slate-300 text-slate-700 cursor-pointer shrink-0" data-cat="normal" onclick="setNoticeFilter('normal', this)">📢 Sinh hoạt chung</button>
+      </div>
+
+      <div id="notices-list" class="space-y-3.5">
+        <!-- Render bằng JS -->
+      </div>
+    </section>
+
+    <!-- ==================== 3. TIN TỨC ==================== -->
+    <section id="view-news" class="view-section hidden space-y-4">
+      <div>
+        <h2 class="text-xl font-extrabold text-slate-900">📰 Tin tức & Gương sáng An Sơn</h2>
+        <p class="text-sm text-slate-600">Cập nhật hoạt động xây dựng Nông thôn mới kiểu mẫu, chuyển đổi số và đời sống bà con.</p>
+      </div>
+      <div id="news-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Render bằng JS -->
+      </div>
+    </section>
+
+    <!-- ==================== 4. LỊCH THÔN ==================== -->
+    <section id="view-calendar" class="view-section hidden space-y-4">
+      <div>
+        <h2 class="text-xl font-extrabold text-slate-900">📅 Lịch hoạt động Thôn An Sơn</h2>
+        <p class="text-sm text-slate-600">Lịch họp dân, tiêm chủng, thu gom rác, sinh hoạt đoàn thể tại Nhà văn hóa thôn.</p>
+      </div>
+      <div id="calendar-list" class="space-y-3">
+        <!-- Render bằng JS -->
+      </div>
+    </section>
+
+    <!-- ==================== 5. CÁN BỘ & ĐƯỜNG DÂY NÓNG ==================== -->
+    <section id="view-officials" class="view-section hidden space-y-5">
+      <div>
+        <h2 class="text-xl font-extrabold text-slate-900">👥 Ban Cán Sự Thôn & Đường Dây Nóng</h2>
+        <p class="text-sm text-slate-600">Bấm nút <strong>Gọi ngay</strong> màu xanh để liên hệ trực tiếp bằng điện thoại.</p>
+      </div>
+
+      <div id="officials-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Render bằng JS -->
+      </div>
+
+      <!-- Khẩn cấp -->
+      <div class="civic-card p-5 bg-red-50/70 border-red-200 space-y-3">
+        <h3 class="text-base font-extrabold text-red-700 flex items-center gap-2">
+          <span>🚨</span> Số điện thoại khẩn cấp 24/7
+        </h3>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          <a href="tel:113" class="bg-white border border-red-200 rounded-xl p-3 text-center hover:bg-red-50 transition">
+            <div class="text-lg font-extrabold text-red-600">113</div>
+            <div class="text-xs font-semibold text-slate-700">Công an</div>
+          </a>
+          <a href="tel:114" class="bg-white border border-red-200 rounded-xl p-3 text-center hover:bg-red-50 transition">
+            <div class="text-lg font-extrabold text-red-600">114</div>
+            <div class="text-xs font-semibold text-slate-700">Cứu hỏa</div>
+          </a>
+          <a href="tel:115" class="bg-white border border-red-200 rounded-xl p-3 text-center hover:bg-red-50 transition">
+            <div class="text-lg font-extrabold text-red-600">115</div>
+            <div class="text-xs font-semibold text-slate-700">Cấp cứu y tế</div>
+          </a>
+          <a href="tel:19001909" class="bg-white border border-red-200 rounded-xl p-3 text-center hover:bg-red-50 transition">
+            <div class="text-lg font-extrabold text-amber-600">1900 1909</div>
+            <div class="text-xs font-semibold text-slate-700">Điện lực miền Trung</div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 6. PHẢN ÁNH KIẾN NGHỊ ==================== -->
+    <section id="view-feedback" class="view-section hidden space-y-5">
+      <div>
+        <h2 class="text-xl font-extrabold text-slate-900">💬 Phản ánh & Góp ý xây dựng thôn</h2>
+        <p class="text-sm text-slate-600">Bà con phát hiện hư hỏng đường sá, điện chiếu sáng, vệ sinh môi trường... hãy gửi ngay để Ban thôn xử lý.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <!-- Form gửi phản ánh -->
+        <div class="lg:col-span-5 civic-card p-5 space-y-4">
+          <h3 class="text-base font-extrabold text-slate-900">📝 Gửi phản ánh mới</h3>
+          <form id="feedback-form" onsubmit="submitFeedback(event)" class="space-y-3.5">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Chủ đề phản ánh *</label>
+              <select id="fb-topic" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                <option value="Đèn đường / Điện lưới">💡 Đèn đường / Điện lưới</option>
+                <option value="Đường giao thông / Mương thoát nước">🛣️ Đường giao thông / Mương thoát nước</option>
+                <option value="Vệ sinh môi trường / Rác thải">♻️ Vệ sinh môi trường / Rác thải</option>
+                <option value="An ninh trật tự">🛡️ An ninh trật tự</option>
+                <option value="Thủ tục hành chính / Giấy tờ">📄 Thủ tục hành chính / Giấy tờ</option>
+                <option value="Góp ý khác">✨ Góp ý khác</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Khu vực / Xóm / Đội</label>
+              <input id="fb-location" type="text" placeholder="Ví dụ: Xóm 2, gần Nhà văn hóa thôn..."
+                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Nội dung chi tiết *</label>
+              <textarea id="fb-content" rows="3" required placeholder="Mô tả ngắn gọn sự việc để cán bộ dễ kiểm tra..."
+                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Họ tên (Không bắt buộc)</label>
+                <input id="fb-name" type="text" placeholder="Để trống nếu ẩn danh"
+                  class="w-full px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Số điện thoại</label>
+                <input id="fb-phone" type="tel" placeholder="Để thôn liên hệ lại"
+                  class="w-full px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+              </div>
+            </div>
+
+            <button type="submit"
+              class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold py-3 rounded-xl text-sm shadow-sm transition cursor-pointer">
+              📤 GỬI PHẢN ÁNH NGAY
+            </button>
+          </form>
+        </div>
+
+        <!-- Danh sách theo dõi tiến độ xử lý -->
+        <div class="lg:col-span-7 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-base font-extrabold text-slate-900">📊 Theo dõi kết quả xử lý</h3>
+            <span id="fb-count-badge" class="badge badge-info">0 phản ánh</span>
+          </div>
+          <div id="feedback-list" class="space-y-3">
+            <!-- Render bằng JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 7. TIỆN ÍCH & MÃ QR ==================== -->
+    <section id="view-utilities" class="view-section hidden space-y-5">
+      <div>
+        <h2 class="text-xl font-extrabold text-slate-900">📱 Tiện ích số & Mã QR Thôn An Sơn</h2>
+        <p class="text-sm text-slate-600">Truy cập nhanh dịch vụ công, cài đặt ứng dụng lên màn hình điện thoại và tải mã QR.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <!-- Thẻ QR Code có thể in dán tại Nhà văn hóa -->
+        <div id="qr-printable-area" class="civic-card p-6 flex flex-col items-center text-center space-y-3">
+          <div class="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">
+            Quét mã bằng Zalo hoặc Camera
+          </div>
+          <h3 class="text-lg font-extrabold text-slate-900">THÔN AN SƠN THÔNG MINH</h3>
+          <div id="qrcode-page-box" class="p-3 bg-white border-2 border-emerald-600 rounded-2xl shadow-xs"></div>
+          <p class="text-xs text-slate-500 max-w-xs">
+            Quét mã QR để mở nhanh Cổng thông tin Thôn An Sơn, Xã Cam Lộ trên điện thoại mà không cần gõ địa chỉ.
+          </p>
+          <div class="flex flex-wrap gap-2 justify-center pt-1">
+            <button onclick="window.print()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl cursor-pointer transition">
+              🖨️ In bảng QR dán Nhà văn hóa
+            </button>
+            <button onclick="copyShareLink()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl cursor-pointer transition">
+              🔗 Sao chép đường link
+            </button>
+          </div>
+        </div>
+
+        <!-- Liên kết Dịch vụ công & Hướng dẫn cài đặt -->
+        <div class="space-y-4">
+          <div class="civic-card p-5 space-y-3">
+            <h3 class="text-base font-extrabold text-slate-900">🏛️ Dịch vụ công trực tuyến</h3>
+            <div class="space-y-2">
+              <a href="https://dichvucong.gov.vn" target="_blank" rel="noopener"
+                class="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 transition">
+                <div>
+                  <div class="text-sm font-bold text-slate-900">Cổng Dịch vụ công Quốc gia</div>
+                  <div class="text-xs text-slate-500">Làm giấy khai sinh, thường trú, đất đai online</div>
+                </div>
+                <span class="text-emerald-600 font-bold text-sm">Mở &rsaquo;</span>
+              </a>
+              <a href="https://dichvucong.quangtri.gov.vn" target="_blank" rel="noopener"
+                class="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 transition">
+                <div>
+                  <div class="text-sm font-bold text-slate-900">Dịch vụ công Tỉnh Quảng Trị</div>
+                  <div class="text-xs text-slate-500">Tra cứu hồ sơ hành chính tỉnh Quảng Trị</div>
+                </div>
+                <span class="text-emerald-600 font-bold text-sm">Mở &rsaquo;</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="civic-card p-5 space-y-2.5 bg-sky-50/50 border-sky-200">
+            <h3 class="text-base font-extrabold text-sky-900">📲 Cách lưu trang thành ứng dụng trên điện thoại</h3>
+            <ol class="text-xs sm:text-sm text-slate-700 space-y-1.5 list-decimal list-inside">
+              <li><strong>Trên iPhone (Safari):</strong> Bấm biểu tượng <em>Chia sẻ (ô vuông có mũi tên lên)</em> &rarr; chọn <strong>"Thêm vào Màn hình chính"</strong>.</li>
+              <li><strong>Trên Android (Chrome):</strong> Bấm dấu <em>3 chấm (⋮)</em> góc trên phải &rarr; chọn <strong>"Thêm vào Màn hình chính"</strong> hoặc <strong>"Cài đặt ứng dụng"</strong>.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER NHẸ NHÀNG -->
+  <footer class="max-w-5xl w-full mx-auto px-4 py-4 text-center text-xs text-slate-500 border-t border-slate-200/80 mt-4">
+    <p class="font-semibold text-slate-600">Cổng Thông Tin Thôn An Sơn Thông Minh • Xã Cam Lộ • Tỉnh Quảng Trị</p>
+    <p class="mt-0.5">Thiết kế tối ưu cho điện thoại & máy tính • Phục vụ cộng đồng miễn phí</p>
+  </footer>
+
+  <!-- THANH ĐIỀU HƯỚNG DƯỚI CÙNG CHO ĐIỆN THOẠI (Giống ảnh mẫu) -->
+  <nav class="bottom-nav md:hidden grid grid-cols-4" aria-label="Thanh điều hướng di động">
+    <button class="bottom-nav-btn active" data-nav="home" onclick="navigateTo('home')">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+      </svg>
+      <span>Trang chủ</span>
+    </button>
+
+    <button class="bottom-nav-btn" data-nav="notices" onclick="navigateTo('notices')">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+      </svg>
+      <span>Thông báo</span>
+    </button>
+
+    <button class="bottom-nav-btn" data-nav="officials" onclick="navigateTo('officials')">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+      <span>Cán bộ</span>
+    </button>
+
+    <button class="bottom-nav-btn" data-nav="feedback" onclick="navigateTo('feedback')">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+      </svg>
+      <span>Phản ánh</span>
+    </button>
+  </nav>
+
+  <!-- ==================== MODAL 1: ĐĂNG KÝ NHẬN THÔNG BÁO ==================== -->
+  <div id="modal-subscribe" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-extrabold text-slate-900">🔔 Đăng ký nhận thông báo thôn</h3>
+        <button onclick="closeModal('modal-subscribe')" class="text-slate-400 hover:text-slate-700 text-xl font-bold cursor-pointer">&times;</button>
+      </div>
+      <p class="text-xs sm:text-sm text-slate-600">
+        Để lại thông tin để Ban quản trị thôn An Sơn gửi tin nhắn Zalo hoặc thông báo khi có lịch họp, cắt điện, tiêm chủng, bão lũ.
+      </p>
+      <form onsubmit="submitSubscribe(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Họ và tên bà con *</label>
+          <input id="sub-name" type="text" required placeholder="Ví dụ: Nguyễn Văn An"
+            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Số điện thoại / Zalo *</label>
+          <input id="sub-phone" type="tel" required placeholder="Ví dụ: 0912 345 678"
+            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Xóm / Đội</label>
+          <select id="sub-group" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white">
+            <option value="Đội 1">Đội 1 - Thôn An Sơn</option>
+            <option value="Đội 2">Đội 2 - Thôn An Sơn</option>
+            <option value="Đội 3">Đội 3 - Thôn An Sơn</option>
+            <option value="Đội 4">Đội 4 - Thôn An Sơn</option>
+          </select>
+        </div>
+        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm cursor-pointer transition">
+          ✅ Xác nhận đăng ký
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 2: MÃ QR NHANH ==================== -->
+  <div id="modal-qr" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl text-center space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-extrabold text-slate-900">📱 Mã QR Thôn An Sơn</h3>
+        <button onclick="closeModal('modal-qr')" class="text-slate-400 hover:text-slate-700 text-xl font-bold cursor-pointer">&times;</button>
+      </div>
+      <div id="qrcode-modal-box" class="inline-block p-3 bg-white border-2 border-emerald-600 rounded-2xl"></div>
+      <p class="text-xs text-slate-600">Đưa camera điện thoại hoặc Zalo vào mã này để mở ngay trang Thôn An Sơn Thông Minh.</p>
+      <button onclick="copyShareLink()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-sm cursor-pointer">
+        🔗 Sao chép đường link chia sẻ
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 3: BAN QUẢN TRỊ THÔN ==================== -->
+  <div id="modal-admin" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 shadow-xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-extrabold text-slate-900">🛡️ Ban Quản Trị Thôn An Sơn</h3>
+        <button onclick="closeModal('modal-admin')" class="text-slate-400 hover:text-slate-700 text-xl font-bold cursor-pointer">&times;</button>
+      </div>
+
+      <!-- Màn hình đăng nhập PIN -->
+      <div id="admin-login-panel" class="space-y-3">
+        <p class="text-sm text-slate-600">Nhập mã PIN Ban quản trị để đăng thông báo mới hoặc cập nhật phản ánh của bà con.</p>
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800">
+          💡 <strong>Mã PIN mặc định dùng thử:</strong> <code class="font-bold bg-white px-1.5 py-0.5 rounded">1234</code>
+        </div>
+        <div class="flex gap-2">
+          <input id="admin-pin-input" type="password" maxlength="8" placeholder="Nhập mã PIN..."
+            class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+          <button onclick="verifyAdminPin()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm cursor-pointer">
+            Đăng nhập
+          </button>
+        </div>
+      </div>
+
+      <!-- Bảng điều khiển khi đã đăng nhập -->
+      <div id="admin-dashboard-panel" class="hidden space-y-5">
+        <div class="flex items-center justify-between bg-emerald-50 border border-emerald-200 px-3.5 py-2 rounded-xl">
+          <span class="text-xs font-bold text-emerald-800">✅ Đang bật chế độ Ban Quản Trị</span>
+          <button onclick="logoutAdmin()" class="text-xs font-bold text-red-600 hover:underline cursor-pointer">Đăng xuất</button>
+        </div>
+
+        <!-- Form đăng thông báo mới -->
+        <form onsubmit="adminAddNotice(event)" class="space-y-3 border-b border-slate-200 pb-4">
+          <h4 class="text-sm font-extrabold text-slate-900">📢 Đăng thông báo mới</h4>
+          <input id="adm-notice-title" type="text" required placeholder="Tiêu đề thông báo..."
+            class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm" />
+          <div class="grid grid-cols-2 gap-2">
+            <select id="adm-notice-level" class="px-3 py-2 rounded-xl border border-slate-300 text-sm bg-white">
+              <option value="normal">📢 Sinh hoạt chung</option>
+              <option value="important">⚠️ Quan trọng</option>
+              <option value="urgent">🚨 Khẩn cấp</option>
+            </select>
+            <input id="adm-notice-author" type="text" value="Ban cán sự thôn"
+              class="px-3 py-2 rounded-xl border border-slate-300 text-sm" />
+          </div>
+          <textarea id="adm-notice-body" rows="3" required placeholder="Nội dung thông báo rõ ràng, ngắn gọn cho bà con..."
+            class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm"></textarea>
+          <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-sm cursor-pointer">
+            ➕ Đăng thông báo ngay
+          </button>
+        </form>
+
+        <!-- Danh sách bà con đã đăng ký -->
+        <div class="space-y-2">
+          <h4 class="text-sm font-extrabold text-slate-900">📋 Bà con đăng ký nhận tin (<span id="adm-sub-count">0</span>)</h4>
+          <div id="adm-sub-list" class="max-h-36 overflow-y-auto space-y-1.5 text-xs"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
