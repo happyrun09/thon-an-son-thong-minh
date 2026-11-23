@@ -7,14 +7,18 @@
    - Phản ánh hiện trường kèm ảnh nén & Quản trị đầy đủ (Thêm/Xóa/Sao lưu/Khôi phục)
    ========================================================================== */
 
+const SUPER_ADMIN_PHONE = '0399985230'; // Ông Nguyễn Anh Hào - Bí thư Chi đoàn (Tổng Quản Trị)
+
 const STORAGE_KEYS = {
-  NOTICES: 'anson_smart_notices_v3',
-  NEWS: 'anson_smart_news_v3',
-  EVENTS: 'anson_smart_events_v3',
-  FEEDBACKS: 'anson_smart_feedbacks_v3',
-  SUBSCRIBERS: 'anson_smart_subscribers_v3',
-  FONT_SCALE: 'anson_smart_font_scale_v3',
-  ADMIN_AUTH: 'anson_smart_admin_auth_v3'
+  NOTICES: 'anson_smart_notices_v4',
+  NEWS: 'anson_smart_news_v4',
+  EVENTS: 'anson_smart_events_v4',
+  FEEDBACKS: 'anson_smart_feedbacks_v4',
+  SUBSCRIBERS: 'anson_smart_subscribers_v4',
+  FONT_SCALE: 'anson_smart_font_scale_v4',
+  ADMIN_SESSION: 'anson_smart_admin_session_v4',
+  SUPER_PIN: 'anson_smart_super_pin_v4',
+  GRANTED_ADMINS: 'anson_smart_granted_admins_v4'
 };
 
 const DEFAULT_NOTICES = [
@@ -125,6 +129,7 @@ const OFFICIALS_DATA = [
     stt: 1,
     name: 'Ông Nguyễn Văn Thon',
     role: 'Bí thư Chi bộ',
+    unit: 'Chi bộ',
     duty: 'Lãnh đạo toàn diện công tác Đảng và phong trào xây dựng Thôn An Sơn kiểu mẫu',
     phone: '0905487333',
     phoneDisplay: '0905 487 333',
@@ -134,6 +139,7 @@ const OFFICIALS_DATA = [
     stt: 2,
     name: 'Ông Nguyễn Trưng Vương',
     role: 'Phó Bí thư Chi bộ, Trưởng thôn',
+    unit: 'Thôn',
     duty: 'Điều hành công việc chung của thôn, xác nhận dân cư, giải quyết kiến nghị bà con',
     phone: '0915713393',
     phoneDisplay: '0915 713 393',
@@ -143,6 +149,7 @@ const OFFICIALS_DATA = [
     stt: 3,
     name: 'Bà Mai Thị Vân Anh',
     role: 'Trưởng ban Công tác Mặt trận',
+    unit: 'Mặt trận',
     duty: 'Vận động đoàn kết toàn dân, công tác an sinh xã hội, hỗ trợ hộ khó khăn',
     phone: '0372850580',
     phoneDisplay: '0372 850 580',
@@ -152,6 +159,7 @@ const OFFICIALS_DATA = [
     stt: 4,
     name: 'Ông Lê Văn Diện',
     role: 'Chi hội trưởng Nông dân',
+    unit: 'Nông dân',
     duty: 'Hỗ trợ kỹ thuật trồng trọt, chăn nuôi, giống cây trồng và vốn vay nông nghiệp',
     phone: '0397074718',
     phoneDisplay: '0397 074 718',
@@ -161,6 +169,7 @@ const OFFICIALS_DATA = [
     stt: 5,
     name: 'Bà Võ Thị Thanh Nga',
     role: 'Chi hội trưởng Phụ nữ',
+    unit: 'Phụ nữ',
     duty: 'Phong trào 5 không 3 sạch, vệ sinh môi trường, tín dụng tiết kiệm hội viên',
     phone: '0365064791',
     phoneDisplay: '0365 064 791',
@@ -170,7 +179,8 @@ const OFFICIALS_DATA = [
     stt: 6,
     name: 'Ông Nguyễn Anh Hào',
     role: 'Bí thư Chi đoàn',
-    duty: 'Công tác thanh niên, Tổ Công nghệ số cộng đồng, hỗ trợ VNeID & chuyển đổi số',
+    unit: 'Đoàn',
+    duty: 'Công tác thanh niên, Tổ Công nghệ số cộng đồng, Tổng Quản Trị cổng thông tin thôn',
     phone: '0399985230',
     phoneDisplay: '0399 985 230',
     badge: 'Đoàn thanh niên'
@@ -179,6 +189,7 @@ const OFFICIALS_DATA = [
     stt: 7,
     name: 'Ông Nguyễn Hữu Thọ',
     role: 'Tổ trưởng Tổ bảo vệ an ninh, trật tự',
+    unit: 'ANTT',
     duty: 'Giữ gìn an ninh trật tự thôn xóm, tuần tra đêm, tiếp nhận tin báo an ninh',
     phone: '0358390113',
     phoneDisplay: '0358 390 113',
@@ -189,6 +200,7 @@ const OFFICIALS_DATA = [
 const DEFAULT_FEEDBACKS = [
   {
     id: 'fb1',
+    unit: 'Thôn',
     topic: 'Đèn đường / Điện lưới',
     location: 'Ngã ba đầu xóm Đội 2',
     content: 'Bóng đèn đường số 08 bị chập chờn 2 hôm nay, mong ban thôn cho kiểm tra thay mới để bà con đi lại buổi tối an toàn.',
@@ -200,6 +212,7 @@ const DEFAULT_FEEDBACKS = [
   },
   {
     id: 'fb2',
+    unit: 'Đoàn',
     topic: 'Đường giao thông / Mương thoát nước',
     location: 'Đoạn mương gần cầu nhỏ Đội 4',
     content: 'Sau trận mưa vừa rồi có ít rác và bèo tấp vào miệng cống thoát nước, cần khơi thông trước đợt mưa tới.',
@@ -207,7 +220,7 @@ const DEFAULT_FEEDBACKS = [
     date: '22/11/2026',
     status: 'processing',
     photo: '',
-    reply: 'Đã tiếp nhận! Đội thanh niên xung kích sẽ xử lý trong sáng mai 23/11.'
+    reply: 'Chi đoàn đã tiếp nhận! Đội thanh niên xung kích sẽ xử lý trong sáng mai 23/11.'
   }
 ];
 
@@ -312,6 +325,7 @@ const PROCEDURES_DATA = [
 ];
 
 let currentNoticeFilter = 'all';
+let currentFeedbackUnitFilter = 'all';
 let currentMarketFilter = 'all';
 let currentSpeakingId = null;
 let pendingFeedbackPhoto = '';
@@ -539,8 +553,21 @@ function getFeedbacks() {
 function getSubscribers() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.SUBSCRIBERS)) || []; } catch { return []; }
 }
+function getAdminSession() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.ADMIN_SESSION)); } catch { return null; }
+}
 function isAdmin() {
-  return localStorage.getItem(STORAGE_KEYS.ADMIN_AUTH) === 'true';
+  return !!getAdminSession();
+}
+function isSuperAdmin() {
+  const s = getAdminSession();
+  return !!(s && s.phone === SUPER_ADMIN_PHONE);
+}
+function getSuperPin() {
+  return localStorage.getItem(STORAGE_KEYS.SUPER_PIN) || 'HAO2026';
+}
+function getGrantedAdmins() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.GRANTED_ADMINS)) || {}; } catch { return {}; }
 }
 
 // ==========================================================================
@@ -922,25 +949,46 @@ function copyPhone(phone, display) {
   }
 }
 
+function setFeedbackUnitFilter(unit, btn) {
+  currentFeedbackUnitFilter = unit;
+  document.querySelectorAll('.fb-unit-filter').forEach(b => {
+    b.className = 'fb-unit-filter px-3 py-1.5 rounded-full text-xs font-bold bg-white border border-slate-300 text-slate-700 cursor-pointer shrink-0';
+  });
+  btn.className = 'fb-unit-filter px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-600 text-white cursor-pointer shrink-0';
+  renderFeedbackPage();
+}
+
 function renderFeedbackPage() {
-  const feedbacks = getFeedbacks();
+  const allFeedbacks = getFeedbacks();
+  const feedbacks = allFeedbacks.filter(fb => currentFeedbackUnitFilter === 'all' || (fb.unit || 'Thôn') === currentFeedbackUnitFilter);
   const countBadge = document.getElementById('fb-count-badge');
-  if (countBadge) countBadge.textContent = `${feedbacks.length} phản ánh`;
+  if (countBadge) countBadge.textContent = `${feedbacks.length} ý kiến`;
 
   const listEl = document.getElementById('feedback-list');
   if (!listEl) return;
 
-  const adminMode = isAdmin();
+  if (feedbacks.length === 0) {
+    listEl.innerHTML = `<div class="civic-card p-6 text-center text-slate-500 text-sm">Chưa có ý kiến nào gửi đến đơn vị này.</div>`;
+    return;
+  }
+
+  const session = getAdminSession();
+  const superMode = isSuperAdmin();
 
   listEl.innerHTML = feedbacks.map(fb => {
     let statusHtml = `<span class="badge badge-info">📥 Đã tiếp nhận</span>`;
     if (fb.status === 'processing') statusHtml = `<span class="badge badge-important">🔧 Đang xử lý</span>`;
     if (fb.status === 'done') statusHtml = `<span class="badge badge-normal">✅ Đã hoàn thành</span>`;
+    const unitLabel = fb.unit || 'Thôn';
+    const canManageThis = superMode || (session && (session.unit === unitLabel || session.unit === 'Thôn'));
 
     return `
       <div class="civic-card p-4 sm:p-5 space-y-2.5">
         <div class="flex flex-wrap items-center justify-between gap-2">
-          <span class="text-xs font-bold text-slate-800 bg-slate-100 px-2.5 py-1 rounded-md">${escapeHtml(fb.topic)}</span>
+          <div class="flex flex-wrap items-center gap-1.5">
+            <span class="text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-md">📌 Gửi: ${escapeHtml(unitLabel)}</span>
+            <span class="text-xs font-bold text-slate-800 bg-slate-100 px-2.5 py-1 rounded-md">${escapeHtml(fb.topic)}</span>
+          </div>
           ${statusHtml}
         </div>
         ${fb.location ? `<div class="text-xs font-semibold text-slate-500">📍 Khu vực: ${escapeHtml(fb.location)}</div>` : ''}
@@ -952,16 +1000,16 @@ function renderFeedbackPage() {
         </div>
         ${fb.reply ? `
           <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs sm:text-sm text-emerald-900">
-            <strong>🛡️ Ban thôn phản hồi:</strong> ${escapeHtml(fb.reply)}
+            <strong>🛡️ Phản hồi (${escapeHtml(unitLabel)}):</strong> ${escapeHtml(fb.reply)}
           </div>
         ` : ''}
-        ${adminMode ? `
+        ${canManageThis ? `
           <div class="pt-2 border-t border-slate-100 flex justify-end gap-2">
             <button onclick="adminDeleteItem('feedback', '${escapeHtml(fb.id)}')" class="text-xs font-bold px-2.5 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 cursor-pointer">
               🗑️ Xóa
             </button>
             <button onclick="openReplyModal('${escapeHtml(fb.id)}')" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 cursor-pointer">
-              ✏️ Cập nhật & Trả lời
+              ✏️ Trả lời ý kiến
             </button>
           </div>
         ` : ''}
@@ -1067,11 +1115,16 @@ function clearFeedbackPhoto() {
 
 function submitFeedback(e) {
   e.preventDefault();
+  const unit = document.getElementById('fb-target-unit').value;
   const topic = document.getElementById('fb-topic').value;
   const location = document.getElementById('fb-location').value.trim();
   const content = document.getElementById('fb-content').value.trim();
   const name = document.getElementById('fb-name').value.trim();
   const phone = document.getElementById('fb-phone').value.trim();
+  if (!unit) {
+    showToast('Bà con vui lòng chọn đơn vị tiếp nhận ý kiến!', '⚠️');
+    return;
+  }
   if (!content) return;
 
   const now = new Date();
@@ -1080,6 +1133,7 @@ function submitFeedback(e) {
   const feedbacks = getFeedbacks();
   feedbacks.unshift({
     id: 'fb-' + Date.now(),
+    unit,
     topic,
     location,
     content,
@@ -1121,39 +1175,124 @@ function submitSubscribe(e) {
 }
 
 // ==========================================================================
-// BAN QUẢN TRỊ: THÊM, XÓA, SAO LƯU & KHÔI PHỤC
+// PHÂN QUYỀN QUẢN TRỊ: TỔNG QUẢN TRỊ NGUYỄN ANH HÀO & CÁN BỘ CỐT CÁN
 // ==========================================================================
-function verifyAdminPin() {
-  const pin = document.getElementById('admin-pin-input').value.trim();
-  if (pin === '1234') {
-    localStorage.setItem(STORAGE_KEYS.ADMIN_AUTH, 'true');
+function populateAdminSelect() {
+  const sel = document.getElementById('admin-user-select');
+  if (!sel) return;
+  const superOfficer = OFFICIALS_DATA.find(o => o.phone === SUPER_ADMIN_PHONE);
+  const others = OFFICIALS_DATA.filter(o => o.phone !== SUPER_ADMIN_PHONE);
+  const ordered = superOfficer ? [superOfficer, ...others] : OFFICIALS_DATA;
+  sel.innerHTML = ordered.map(o => {
+    const prefix = o.phone === SUPER_ADMIN_PHONE ? '👑 [Tổng Quản Trị] ' : '🛡️ ';
+    return `<option value="${o.phone}">${prefix}${escapeHtml(o.name)} — ${escapeHtml(o.role)}</option>`;
+  }).join('');
+}
+
+function verifyAdminLogin() {
+  const phone = document.getElementById('admin-user-select')?.value;
+  const pin = document.getElementById('admin-pin-input')?.value.trim();
+  if (!phone || !pin) {
+    showToast('Vui lòng chọn cán bộ và nhập mã PIN!', '⚠️');
+    return;
+  }
+
+  const officer = OFFICIALS_DATA.find(o => o.phone === phone);
+  if (!officer) return;
+
+  // 1. Tổng quản trị Nguyễn Anh Hào
+  if (phone === SUPER_ADMIN_PHONE) {
+    if (pin === getSuperPin()) {
+      localStorage.setItem(STORAGE_KEYS.ADMIN_SESSION, JSON.stringify({
+        phone: officer.phone,
+        name: officer.name,
+        role: officer.role,
+        unit: officer.unit,
+        isSuperAdmin: true
+      }));
+      document.getElementById('admin-pin-input').value = '';
+      updateAdminUI();
+      renderAll();
+      showToast('Xin chào Tổng Quản Trị Nguyễn Anh Hào!', '👑');
+    } else {
+      showToast('Mã PIN Tổng Quản Trị chưa đúng!', '⚠️');
+    }
+    return;
+  }
+
+  // 2. Cán bộ cốt cán được Nguyễn Anh Hào cấp quyền
+  const granted = getGrantedAdmins()[phone];
+  if (!granted || !granted.enabled) {
+    showToast('Tài khoản chưa được Nguyễn Anh Hào cấp quyền quản trị!', '🔒');
+    return;
+  }
+
+  if (pin === granted.pin) {
+    localStorage.setItem(STORAGE_KEYS.ADMIN_SESSION, JSON.stringify({
+      phone: officer.phone,
+      name: officer.name,
+      role: officer.role,
+      unit: officer.unit,
+      isSuperAdmin: false
+    }));
     document.getElementById('admin-pin-input').value = '';
     updateAdminUI();
     renderAll();
-    showToast('Đăng nhập Ban Quản Trị thành công!', '🛡️');
+    showToast(`Đăng nhập thành công: ${officer.name}!`, '🛡️');
   } else {
-    showToast('Mã PIN chưa đúng (Mặc định dùng thử: 1234)', '⚠️');
+    showToast('Mã PIN chưa đúng! Hãy kiểm tra lại mã PIN được cấp.', '⚠️');
   }
 }
 
 function logoutAdmin() {
-  localStorage.removeItem(STORAGE_KEYS.ADMIN_AUTH);
+  localStorage.removeItem(STORAGE_KEYS.ADMIN_SESSION);
   updateAdminUI();
   renderAll();
-  showToast('Đã thoát chế độ Ban Quản Trị.', '👋');
+  showToast('Đã đăng xuất khỏi chế độ Quản trị.', '👋');
 }
 
 function updateAdminUI() {
-  const authed = isAdmin();
+  populateAdminSelect();
+  const session = getAdminSession();
+  const authed = !!session;
+  const superMode = isSuperAdmin();
+
   const loginPanel = document.getElementById('admin-login-panel');
   const dashPanel = document.getElementById('admin-dashboard-panel');
+  const grantPanel = document.getElementById('super-admin-grant-panel');
+  const sessionBadge = document.getElementById('admin-session-badge');
+  const btnHeader = document.getElementById('btn-header-admin');
+  const btnIcon = document.getElementById('admin-btn-icon');
   const btnText = document.getElementById('admin-btn-text');
 
   if (loginPanel && dashPanel) {
     loginPanel.classList.toggle('hidden', authed);
     dashPanel.classList.toggle('hidden', !authed);
   }
-  if (btnText) btnText.textContent = authed ? 'Quản trị (Đang bật)' : 'Ban quản trị';
+  if (grantPanel) {
+    grantPanel.classList.toggle('hidden', !superMode);
+    if (superMode) renderGrantOfficersList();
+  }
+  if (sessionBadge && session) {
+    sessionBadge.textContent = superMode
+      ? `👑 Tổng Quản Trị: ${session.name}`
+      : `🛡️ Quản trị (${session.unit}): ${session.name}`;
+  }
+  if (btnHeader && btnIcon && btnText) {
+    if (superMode) {
+      btnIcon.textContent = '👑';
+      btnText.textContent = 'Admin: Nguyễn Anh Hào';
+      btnHeader.className = 'inline-flex items-center gap-1.5 bg-amber-400 hover:bg-amber-300 text-slate-900 border border-amber-200 px-3 py-1.5 rounded-lg text-xs font-extrabold shadow-sm transition cursor-pointer';
+    } else if (authed) {
+      btnIcon.textContent = '🛡️';
+      btnText.textContent = `Quản trị: ${session.unit}`;
+      btnHeader.className = 'inline-flex items-center gap-1.5 bg-emerald-900/60 hover:bg-emerald-900/80 text-white border border-emerald-300/50 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer';
+    } else {
+      btnIcon.textContent = '🛡️';
+      btnText.textContent = 'Quản trị';
+      btnHeader.className = 'inline-flex items-center gap-1.5 bg-white/20 hover:bg-white/30 border border-white/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer';
+    }
+  }
 
   const subs = getSubscribers();
   const subCount = document.getElementById('adm-sub-count');
@@ -1164,6 +1303,61 @@ function updateAdminUI() {
       ? '<div class="text-slate-400 italic">Chưa có bà con nào đăng ký mới.</div>'
       : subs.map(s => `<div class="p-2 bg-slate-50 rounded-lg border border-slate-200 flex justify-between"><span><strong>${escapeHtml(s.name)}</strong> (${escapeHtml(s.group)})</span><span class="font-mono">${escapeHtml(s.phone)}</span></div>`).join('');
   }
+}
+
+function renderGrantOfficersList() {
+  const el = document.getElementById('grant-officers-list');
+  if (!el) return;
+  const granted = getGrantedAdmins();
+  const coreOfficers = OFFICIALS_DATA.filter(o => o.phone !== SUPER_ADMIN_PHONE);
+
+  el.innerHTML = coreOfficers.map(o => {
+    const state = granted[o.phone] || { enabled: false, pin: '' };
+    return `
+      <div class="bg-white border border-amber-200 rounded-xl p-2.5 flex items-center justify-between gap-2">
+        <div class="min-w-0">
+          <div class="text-xs font-extrabold text-slate-900 truncate">${escapeHtml(o.name)}</div>
+          <div class="text-[11px] text-slate-600 truncate">${escapeHtml(o.role)} (${escapeHtml(o.unit)})</div>
+          ${state.enabled ? `<div class="text-[11px] font-mono font-bold text-emerald-700 mt-0.5">🔑 Mã PIN cấp: ${escapeHtml(state.pin)}</div>` : ''}
+        </div>
+        <button onclick="toggleOfficerGrant('${o.phone}')"
+          class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition ${state.enabled ? 'bg-red-50 text-red-700 hover:bg-red-100' : 'bg-emerald-600 text-white hover:bg-emerald-700'}">
+          ${state.enabled ? 'Thu hồi' : 'Cấp quyền'}
+        </button>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleOfficerGrant(phone) {
+  if (!isSuperAdmin()) {
+    showToast('Chỉ Tổng Quản Trị Nguyễn Anh Hào mới có quyền này!', '🔒');
+    return;
+  }
+  const granted = getGrantedAdmins();
+  const current = granted[phone];
+  if (current && current.enabled) {
+    granted[phone] = { ...current, enabled: false };
+    showToast('Đã thu hồi quyền quản trị của cán bộ.', '🔒');
+  } else {
+    const autoPin = current?.pin || String(Math.floor(100000 + Math.random() * 900000));
+    granted[phone] = { enabled: true, pin: autoPin };
+    showToast(`Đã cấp quyền! Mã PIN đăng nhập: ${autoPin}`, '🔑');
+  }
+  localStorage.setItem(STORAGE_KEYS.GRANTED_ADMINS, JSON.stringify(granted));
+  renderGrantOfficersList();
+}
+
+function changeSuperAdminPin() {
+  if (!isSuperAdmin()) return;
+  const newPin = document.getElementById('new-super-pin')?.value.trim();
+  if (!newPin || newPin.length < 4) {
+    showToast('Mã PIN mới phải có ít nhất 4 ký tự!', '⚠️');
+    return;
+  }
+  localStorage.setItem(STORAGE_KEYS.SUPER_PIN, newPin);
+  document.getElementById('new-super-pin').value = '';
+  showToast('Đã đổi mã PIN Tổng Quản Trị thành công!', '🔐');
 }
 
 function adminAddNotice(e) {

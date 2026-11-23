@@ -83,11 +83,11 @@
             <span class="hidden sm:inline ml-1">Mã QR</span>
           </button>
 
-          <!-- Nút Ban quản trị -->
-          <button onclick="openAdminModal()"
+          <!-- Nút Ban quản trị / Admin -->
+          <button onclick="openAdminModal()" id="btn-header-admin"
             class="inline-flex items-center gap-1.5 bg-white/20 hover:bg-white/30 border border-white/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer">
-            <span>🛡️</span>
-            <span id="admin-btn-text">Ban quản trị</span>
+            <span id="admin-btn-icon">🛡️</span>
+            <span id="admin-btn-text">Quản trị</span>
           </button>
         </div>
       </div>
@@ -127,7 +127,7 @@
         <button class="desktop-nav-btn" data-nav="news" onclick="navigateTo('news')">📰 Tin tức</button>
         <button class="desktop-nav-btn" data-nav="calendar" onclick="navigateTo('calendar')">📅 Lịch thôn</button>
         <button class="desktop-nav-btn" data-nav="officials" onclick="navigateTo('officials')">👥 Cán bộ</button>
-        <button class="desktop-nav-btn" data-nav="feedback" onclick="navigateTo('feedback')">💬 Phản ánh</button>
+        <button class="desktop-nav-btn" data-nav="feedback" onclick="navigateTo('feedback')">💡 Ý kiến bà con</button>
         <button class="desktop-nav-btn" data-nav="market" onclick="navigateTo('market')">🛒 Chợ quê OCOP</button>
         <button class="desktop-nav-btn" data-nav="utilities" onclick="navigateTo('utilities')">📱 Tiện ích</button>
       </div>
@@ -157,11 +157,16 @@
               Thông tin nhanh chóng – Kết nối cộng đồng – Chung tay xây dựng quê hương.
             </p>
           </div>
-          <div class="flex flex-col sm:items-end gap-2 shrink-0">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 shrink-0">
+            <button onclick="navigateTo('feedback')"
+              class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-bold text-sm px-4 py-3 rounded-xl shadow-sm transition cursor-pointer">
+              <span>💡</span>
+              <span>Ý KIẾN CỦA BÀ CON</span>
+            </button>
             <button onclick="openSubscribeModal()"
-              class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-emerald-700 hover:bg-emerald-800 active:scale-95 text-white font-bold text-sm px-5 py-3 rounded-xl shadow-sm transition cursor-pointer">
+              class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-emerald-700 hover:bg-emerald-800 active:scale-95 text-white font-bold text-sm px-4 py-3 rounded-xl shadow-sm transition cursor-pointer">
               <span>🔔</span>
-              <span>ĐĂNG KÝ NHẬN THÔNG BÁO</span>
+              <span>ĐĂNG KÝ NHẬN TIN</span>
             </button>
           </div>
         </div>
@@ -203,8 +208,8 @@
         </button>
 
         <button onclick="navigateTo('feedback')" class="quick-tile">
-          <div class="tile-icon-box bg-amber-50 text-amber-600">💬</div>
-          <span class="text-xs sm:text-sm font-bold text-slate-800">Phản ánh</span>
+          <div class="tile-icon-box bg-amber-50 text-amber-600">💡</div>
+          <span class="text-xs sm:text-sm font-bold text-slate-800">Ý kiến bà con</span>
         </button>
 
         <button onclick="navigateTo('market')" class="quick-tile">
@@ -338,27 +343,42 @@
       </div>
     </section>
 
-    <!-- ==================== 6. PHẢN ÁNH KIẾN NGHỊ ==================== -->
+    <!-- ==================== 6. Ý KIẾN & PHẢN ÁNH CỦA BÀ CON ==================== -->
     <section id="view-feedback" class="view-section hidden space-y-5">
       <div>
-        <h2 class="text-xl font-extrabold text-slate-900">💬 Phản ánh & Góp ý xây dựng thôn</h2>
-        <p class="text-sm text-slate-600">Bà con phát hiện hư hỏng đường sá, điện chiếu sáng, vệ sinh... có thể chụp ảnh và gửi ngay để Ban thôn xử lý.</p>
+        <h2 class="text-xl font-extrabold text-slate-900">💡 Hòm Thư Ý Kiến & Phản Ánh Của Bà Con</h2>
+        <p class="text-sm text-slate-600">Bà con vui lòng <strong>phân loại rõ đơn vị tiếp nhận</strong> (Thôn, Chi bộ, Phụ nữ, Đoàn, Nông dân, ANTT...) để cán bộ phụ trách xử lý nhanh nhất.</p>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        <!-- Form gửi phản ánh -->
+        <!-- Form gửi ý kiến / phản ánh -->
         <div class="lg:col-span-5 civic-card p-5 space-y-4">
-          <h3 class="text-base font-extrabold text-slate-900">📝 Gửi phản ánh mới</h3>
+          <h3 class="text-base font-extrabold text-slate-900">📝 Gửi ý kiến đóng góp mới</h3>
           <form id="feedback-form" onsubmit="submitFeedback(event)" class="space-y-3.5">
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Chủ đề phản ánh *</label>
+              <label class="block text-xs font-bold text-slate-700 mb-1">1. Gửi đến đơn vị / đoàn thể nào? *</label>
+              <select id="fb-target-unit" required class="w-full px-3.5 py-2.5 rounded-xl border-2 border-emerald-200 bg-emerald-50/40 text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                <option value="">-- Bà con chọn đơn vị tiếp nhận --</option>
+                <option value="Thôn">🏡 Ban Thôn / Trưởng thôn (Ông Nguyễn Trưng Vương)</option>
+                <option value="Chi bộ">🏛️ Chi bộ Đảng (Ông Nguyễn Văn Thon)</option>
+                <option value="Mặt trận">🤝 Ban Công tác Mặt trận (Bà Mai Thị Vân Anh)</option>
+                <option value="Nông dân">🌾 Chi hội Nông dân (Ông Lê Văn Diện)</option>
+                <option value="Phụ nữ">👩 Chi hội Phụ nữ (Bà Võ Thị Thanh Nga)</option>
+                <option value="Đoàn">🔥 Chi đoàn Thanh niên (Ông Nguyễn Anh Hào)</option>
+                <option value="ANTT">🛡️ Tổ Bảo vệ ANTT (Ông Nguyễn Hữu Thọ)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">2. Lĩnh vực nội dung *</label>
               <select id="fb-topic" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                <option value="Đèn đường / Điện lưới">💡 Đèn đường / Điện lưới</option>
+                <option value="Đề xuất / Hiến kế xây dựng thôn">💡 Đề xuất / Hiến kế xây dựng thôn</option>
+                <option value="Đèn đường / Điện lưới">⚡ Đèn đường / Điện lưới</option>
                 <option value="Đường giao thông / Mương thoát nước">🛣️ Đường giao thông / Mương thoát nước</option>
                 <option value="Vệ sinh môi trường / Rác thải">♻️ Vệ sinh môi trường / Rác thải</option>
                 <option value="An ninh trật tự">🛡️ An ninh trật tự</option>
+                <option value="Hoạt động Hội / Đoàn thể">🤝 Hoạt động Hội / Đoàn thể</option>
                 <option value="Thủ tục hành chính / Giấy tờ">📄 Thủ tục hành chính / Giấy tờ</option>
-                <option value="Góp ý khác">✨ Góp ý khác</option>
               </select>
             </div>
 
@@ -369,14 +389,14 @@
             </div>
 
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Nội dung chi tiết *</label>
-              <textarea id="fb-content" rows="3" required placeholder="Mô tả ngắn gọn sự việc để cán bộ dễ kiểm tra..."
+              <label class="block text-xs font-bold text-slate-700 mb-1">3. Nội dung ý kiến / phản ánh *</label>
+              <textarea id="fb-content" rows="3" required placeholder="Mô tả rõ ý kiến đóng góp hoặc sự việc cần hỗ trợ..."
                 class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
             </div>
 
             <!-- Đính kèm ảnh hiện trường -->
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Ảnh hiện trường (Không bắt buộc)</label>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Ảnh minh họa / hiện trường (Không bắt buộc)</label>
               <input id="fb-photo" type="file" accept="image/*" onchange="handleFeedbackPhoto(this)"
                 class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer" />
               <div id="fb-photo-preview-box" class="hidden mt-2 relative inline-block">
@@ -393,23 +413,33 @@
               </div>
               <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1">Số điện thoại</label>
-                <input id="fb-phone" type="tel" placeholder="Để thôn liên hệ lại"
+                <input id="fb-phone" type="tel" placeholder="Để cán bộ liên hệ lại"
                   class="w-full px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
               </div>
             </div>
 
             <button type="submit"
               class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold py-3 rounded-xl text-sm shadow-sm transition cursor-pointer">
-              📤 GỬI PHẢN ÁNH NGAY
+              📤 GỬI Ý KIẾN ĐẾN ĐƠN VỊ ĐÃ CHỌN
             </button>
           </form>
         </div>
 
-        <!-- Danh sách theo dõi tiến độ xử lý -->
+        <!-- Danh sách theo dõi tiến độ xử lý & Bộ lọc đơn vị -->
         <div class="lg:col-span-7 space-y-3">
           <div class="flex items-center justify-between">
-            <h3 class="text-base font-extrabold text-slate-900">📊 Theo dõi kết quả xử lý</h3>
-            <span id="fb-count-badge" class="badge badge-info">0 phản ánh</span>
+            <h3 class="text-base font-extrabold text-slate-900">📊 Theo dõi tiếp nhận & xử lý</h3>
+            <span id="fb-count-badge" class="badge badge-info">0 ý kiến</span>
+          </div>
+          <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
+            <button class="fb-unit-filter px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-600 text-white cursor-pointer shrink-0" onclick="setFeedbackUnitFilter('all', this)">Tất cả</button>
+            <button class="fb-unit-filter px-3 py-1.5 rounded-full text-xs font-bold bg-white border border-slate-300 text-slate-700 cursor-pointer shrink-0" onclick="setFeedbackUnitFilter('Thôn', this)">🏡 Thôn</button>
+            <button class="fb-unit-filter px-3 py-1.5 rounded-full text-xs font-bold bg-white border border-slate-300 text-slate-700 cursor-pointer shrink-0" onclick="setFeedbackUnitFilter('Chi bộ', this)">🏛️ Chi bộ</button>
+            <button class="fb-unit-filter px-3 py-1.5 rounded-full text-xs font-bold bg-white border border-slate-300 text-slate-700 cursor-pointer shrink-0" onclick="setFeedbackUnitFilter('Mặt trận', this)">🤝 Mặt trận</button>
+            <button class="fb-unit-filter px-3 py-1.5 rounded-full text-xs font-bold bg-white border border-slate-300 text-slate-700 cursor-pointer shrink-0" onclick="setFeedbackUnitFilter('Nông dân', this)">🌾 Nông dân</button>
+            <button class="fb-unit-filter px-3 py-1.5 rounded-full text-xs font-bold bg-white border border-slate-300 text-slate-700 cursor-pointer shrink-0" onclick="setFeedbackUnitFilter('Phụ nữ', this)">👩 Phụ nữ</button>
+            <button class="fb-unit-filter px-3 py-1.5 rounded-full text-xs font-bold bg-white border border-slate-300 text-slate-700 cursor-pointer shrink-0" onclick="setFeedbackUnitFilter('Đoàn', this)">🔥 Đoàn</button>
+            <button class="fb-unit-filter px-3 py-1.5 rounded-full text-xs font-bold bg-white border border-slate-300 text-slate-700 cursor-pointer shrink-0" onclick="setFeedbackUnitFilter('ANTT', this)">🛡️ ANTT</button>
           </div>
           <div id="feedback-list" class="space-y-3"></div>
         </div>
@@ -640,26 +670,51 @@
         <button onclick="closeModal('modal-admin')" class="text-slate-400 hover:text-slate-700 text-xl font-bold cursor-pointer">&times;</button>
       </div>
 
-      <!-- Màn hình đăng nhập PIN -->
+      <!-- Màn hình đăng nhập phân quyền -->
       <div id="admin-login-panel" class="space-y-3">
-        <p class="text-sm text-slate-600">Nhập mã PIN Ban quản trị để đăng thông báo, tin tức, lịch thôn hoặc trả lời phản ánh của bà con.</p>
-        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800">
-          💡 <strong>Mã PIN mặc định dùng thử:</strong> <code class="font-bold bg-white px-1.5 py-0.5 rounded">1234</code>
+        <p class="text-sm text-slate-600">Chọn tên cán bộ trong danh sách chính thức và nhập mã PIN để quản trị trang.</p>
+        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-900 space-y-1">
+          <div>👑 <strong>Tổng Quản Trị (Super Admin):</strong> Ông <strong>Nguyễn Anh Hào</strong> (Bí thư Chi đoàn) — Mã PIN mặc định: <code class="font-bold bg-white px-1.5 py-0.5 rounded">HAO2026</code></div>
+          <div class="text-slate-600">🛡️ Các cán bộ cốt cán khác cần được <strong>Nguyễn Anh Hào</strong> cấp quyền &amp; cấp mã PIN mới có thể đăng nhập.</div>
         </div>
-        <div class="flex gap-2">
-          <input id="admin-pin-input" type="password" maxlength="8" placeholder="Nhập mã PIN..."
-            class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
-          <button onclick="verifyAdminPin()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm cursor-pointer">
-            Đăng nhập
-          </button>
+        <div class="space-y-2.5">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Chọn Cán bộ quản trị</label>
+            <select id="admin-user-select" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold bg-white">
+              <!-- Render bằng JS từ danh sách 7 cán bộ -->
+            </select>
+          </div>
+          <div class="flex gap-2">
+            <input id="admin-pin-input" type="password" maxlength="16" placeholder="Nhập mã PIN..."
+              class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+            <button onclick="verifyAdminLogin()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm cursor-pointer">
+              Đăng nhập
+            </button>
+          </div>
         </div>
       </div>
 
       <!-- Bảng điều khiển khi đã đăng nhập -->
       <div id="admin-dashboard-panel" class="hidden space-y-4">
-        <div class="flex items-center justify-between bg-emerald-50 border border-emerald-200 px-3.5 py-2 rounded-xl">
-          <span class="text-xs font-bold text-emerald-800">✅ Đang bật chế độ Ban Quản Trị</span>
+        <div class="flex items-center justify-between bg-emerald-50 border border-emerald-200 px-3.5 py-2.5 rounded-xl">
+          <span id="admin-session-badge" class="text-xs font-bold text-emerald-900">✅ Đang bật chế độ Quản trị</span>
           <button onclick="logoutAdmin()" class="text-xs font-bold text-red-600 hover:underline cursor-pointer">Đăng xuất</button>
+        </div>
+
+        <!-- KHU VỰC ĐỘC QUYỀN CỦA TỔNG QUẢN TRỊ NGUYỄN ANH HÀO -->
+        <div id="super-admin-grant-panel" class="hidden space-y-3 bg-amber-50/70 border border-amber-200 rounded-2xl p-4">
+          <div class="flex items-center justify-between gap-2">
+            <h4 class="text-sm font-extrabold text-amber-900">👑 Phân quyền Cán bộ Cốt Cán (Chỉ Nguyễn Anh Hào)</h4>
+          </div>
+          <p class="text-xs text-amber-800">Bật/tắt quyền quản trị và xem mã PIN cấp cho 6 cán bộ có tên trong danh sách chính thức:</p>
+          <div id="grant-officers-list" class="space-y-2 max-h-56 overflow-y-auto"></div>
+          <div class="pt-2 border-t border-amber-200 flex gap-2">
+            <input id="new-super-pin" type="password" maxlength="16" placeholder="Đổi mã PIN mới cho Nguyễn Anh Hào..."
+              class="flex-1 px-3 py-1.5 rounded-lg border border-amber-300 bg-white text-xs" />
+            <button onclick="changeSuperAdminPin()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer">
+              Đổi PIN
+            </button>
+          </div>
         </div>
 
         <!-- Form đăng thông báo mới -->
