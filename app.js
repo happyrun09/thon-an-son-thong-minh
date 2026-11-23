@@ -8,6 +8,7 @@
    ========================================================================== */
 
 const SUPER_ADMIN_PHONE = '0399985230'; // Ông Nguyễn Anh Hào - Bí thư Chi đoàn (Tổng Quản Trị)
+const DEFAULT_SUPER_PIN_HASH = 'cbf4c2c98f95674affa1a3e24be0eb4e77f29f98541d63164b4146a9fa7e821d';
 
 const STORAGE_KEYS = {
   NOTICES: 'anson_smart_notices_v4',
@@ -17,7 +18,7 @@ const STORAGE_KEYS = {
   SUBSCRIBERS: 'anson_smart_subscribers_v4',
   FONT_SCALE: 'anson_smart_font_scale_v4',
   ADMIN_SESSION: 'anson_smart_admin_session_v4',
-  SUPER_PIN: 'anson_smart_super_pin_v4',
+  SUPER_PIN_HASH: 'anson_smart_super_pin_hash_v5',
   GRANTED_ADMINS: 'anson_smart_granted_admins_v4'
 };
 
@@ -563,8 +564,12 @@ function isSuperAdmin() {
   const s = getAdminSession();
   return !!(s && s.phone === SUPER_ADMIN_PHONE);
 }
-function getSuperPin() {
-  return localStorage.getItem(STORAGE_KEYS.SUPER_PIN) || 'HAO2026';
+function getSuperPinHash() {
+  return localStorage.getItem(STORAGE_KEYS.SUPER_PIN_HASH) || DEFAULT_SUPER_PIN_HASH;
+}
+async function sha256Hex(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 function getGrantedAdmins() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.GRANTED_ADMINS)) || {}; } catch { return {}; }
@@ -1189,7 +1194,7 @@ function populateAdminSelect() {
   }).join('');
 }
 
-function verifyAdminLogin() {
+async function verifyAdminLogin() {
   const phone = document.getElementById('admin-user-select')?.value;
   const pin = document.getElementById('admin-pin-input')?.value.trim();
   if (!phone || !pin) {
@@ -1200,9 +1205,10 @@ function verifyAdminLogin() {
   const officer = OFFICIALS_DATA.find(o => o.phone === phone);
   if (!officer) return;
 
-  // 1. Tổng quản trị Nguyễn Anh Hào
+  // 1. Tổng quản trị Nguyễn Anh Hào (kiểm tra bằng SHA-256 hash)
   if (phone === SUPER_ADMIN_PHONE) {
-    if (pin === getSuperPin()) {
+    const inputHash = await sha256Hex(pin);
+    if (inputHash === getSuperPinHash()) {
       localStorage.setItem(STORAGE_KEYS.ADMIN_SESSION, JSON.stringify({
         phone: officer.phone,
         name: officer.name,
@@ -1348,14 +1354,15 @@ function toggleOfficerGrant(phone) {
   renderGrantOfficersList();
 }
 
-function changeSuperAdminPin() {
+async function changeSuperAdminPin() {
   if (!isSuperAdmin()) return;
   const newPin = document.getElementById('new-super-pin')?.value.trim();
   if (!newPin || newPin.length < 4) {
     showToast('Mã PIN mới phải có ít nhất 4 ký tự!', '⚠️');
     return;
   }
-  localStorage.setItem(STORAGE_KEYS.SUPER_PIN, newPin);
+  const hash = await sha256Hex(newPin);
+  localStorage.setItem(STORAGE_KEYS.SUPER_PIN_HASH, hash);
   document.getElementById('new-super-pin').value = '';
   showToast('Đã đổi mã PIN Tổng Quản Trị thành công!', '🔐');
 }

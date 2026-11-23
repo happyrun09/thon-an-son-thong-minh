@@ -1,4 +1,4 @@
-const CACHE_NAME = 'thon-an-son-v4';
+const CACHE_NAME = 'thon-an-son-v5';
 const CORE_ASSETS = [
   './',
   './index.html',
