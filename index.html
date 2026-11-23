@@ -8,6 +8,8 @@
   <meta property="og:title" content="Thôn An Sơn Thông Minh • Xã Cam Lộ, Tỉnh Quảng Trị" />
   <meta property="og:description" content="Thông tin nhanh chóng – Kết nối cộng đồng – Dễ dùng trên điện thoại & máy tính cho mọi bà con Thôn An Sơn." />
   <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://lephucnhat.vn/thon-an-son-thong-minh/" />
+  <link rel="canonical" href="https://lephucnhat.vn/thon-an-son-thong-minh/" />
   <meta name="theme-color" content="#059669" />
   <link rel="manifest" href="manifest.json" />
 
@@ -117,7 +119,7 @@
   </header>
 
   <!-- THANH ĐIỀU HƯỚNG MÁY TÍNH -->
-  <nav class="hidden md:block bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs" aria-label="Điều hướng chính">
+  <nav class="hidden md:block bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm" aria-label="Điều hướng chính">
     <div class="max-w-5xl mx-auto px-4 py-2.5 flex items-center justify-between gap-2 overflow-x-auto">
       <div class="flex items-center gap-1">
         <button class="desktop-nav-btn active" data-nav="home" onclick="navigateTo('home')">🏠 Trang chủ</button>
@@ -443,7 +445,7 @@
             Quét mã bằng Zalo hoặc Camera
           </div>
           <h3 class="text-lg font-extrabold text-slate-900">THÔN AN SƠN THÔNG MINH</h3>
-          <div id="qrcode-page-box" class="p-3 bg-white border-2 border-emerald-600 rounded-2xl shadow-xs"></div>
+          <div id="qrcode-page-box" class="p-3 bg-white border-2 border-emerald-600 rounded-2xl shadow-sm"></div>
           <p class="text-xs text-slate-500 max-w-xs">
             Quét mã QR để mở nhanh Cổng thông tin Thôn An Sơn, Xã Cam Lộ trên điện thoại mà không cần gõ địa chỉ.
           </p>
@@ -476,6 +478,14 @@
                   <div class="text-xs text-slate-500">Tra cứu hồ sơ hành chính tỉnh Quảng Trị</div>
                 </div>
                 <span class="text-emerald-600 font-bold text-sm">Mở &rsaquo;</span>
+              </a>
+              <a href="https://lephucnhat.vn/an-son-ngay-moi-4d/" target="_blank" rel="noopener"
+                class="flex items-center justify-between p-3 rounded-xl bg-emerald-50/70 hover:bg-emerald-100 border border-emerald-200 transition">
+                <div>
+                  <div class="text-sm font-bold text-emerald-900">An Sơn Ngày Mới • Cẩm Nang 4D</div>
+                  <div class="text-xs text-emerald-700">12 Chương 4D &amp; 5 Skill AI hỗ trợ Chi đoàn Thôn An Sơn</div>
+                </div>
+                <span class="text-emerald-700 font-bold text-sm">Mở &rsaquo;</span>
               </a>
             </div>
           </div>
@@ -547,7 +557,7 @@
   </nav>
 
   <!-- ==================== BOTTOM SHEET MENU MỞ RỘNG TRÊN ĐIỆN THOẠI ==================== -->
-  <div id="modal-mobile-menu" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-end justify-center" onclick="if(event.target===this) closeModal('modal-mobile-menu')">
+  <div id="modal-mobile-menu" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-end justify-center" onclick="if(event.target===this) closeModal('modal-mobile-menu')">
     <div class="bg-white rounded-t-3xl w-full max-w-lg p-5 pb-8 space-y-4 shadow-2xl">
       <div class="flex items-center justify-between">
         <h3 class="text-base font-extrabold text-slate-900">📌 Danh mục đầy đủ</h3>
@@ -571,7 +581,7 @@
   </div>
 
   <!-- ==================== MODAL 1: ĐĂNG KÝ NHẬN THÔNG BÁO ==================== -->
-  <div id="modal-subscribe" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+  <div id="modal-subscribe" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4">
       <div class="flex items-center justify-between">
         <h3 class="text-lg font-extrabold text-slate-900">🔔 Đăng ký nhận thông báo thôn</h3>
@@ -608,7 +618,7 @@
   </div>
 
   <!-- ==================== MODAL 2: MÃ QR NHANH ==================== -->
-  <div id="modal-qr" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+  <div id="modal-qr" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl text-center space-y-4">
       <div class="flex items-center justify-between">
         <h3 class="text-base font-extrabold text-slate-900">📱 Mã QR Thôn An Sơn</h3>
@@ -616,14 +626,14 @@
       </div>
       <div id="qrcode-modal-box" class="inline-block p-3 bg-white border-2 border-emerald-600 rounded-2xl"></div>
       <p class="text-xs text-slate-600">Đưa camera điện thoại hoặc Zalo vào mã này để mở ngay trang Thôn An Sơn Thông Minh.</p>
-      <button onclick="copyShareLink()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-sm cursor-pointer">
-        🔗 Sao chép đường link chia sẻ
+      <button onclick="shareSiteNative()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-sm cursor-pointer">
+        📤 Chia sẻ qua Zalo / Sao chép link
       </button>
     </div>
   </div>
 
   <!-- ==================== MODAL 3: BAN QUẢN TRỊ THÔN ==================== -->
-  <div id="modal-admin" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+  <div id="modal-admin" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 shadow-xl space-y-4">
       <div class="flex items-center justify-between">
         <h3 class="text-lg font-extrabold text-slate-900">🛡️ Ban Quản Trị Thôn An Sơn</h3>
@@ -728,7 +738,7 @@
   </div>
 
   <!-- ==================== MODAL 4: TRẢ LỜI PHẢN ÁNH (THAY PROMPT) ==================== -->
-  <div id="modal-reply-fb" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+  <div id="modal-reply-fb" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4">
       <div class="flex items-center justify-between">
         <h3 class="text-base font-extrabold text-slate-900">🛡️ Cập nhật xử lý phản ánh</h3>

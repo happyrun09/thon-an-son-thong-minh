@@ -860,7 +860,13 @@ function renderCalendarPage() {
 function saveEventReminder(evId) {
   const ev = getEvents().find(e => e.id === evId);
   if (!ev) return;
-  showToast(`Đã lưu nhắc lịch: ${ev.title} (${ev.day} ${ev.month})`, '📅');
+  const key = 'anson_reminders_v3';
+  let saved = [];
+  try { saved = JSON.parse(localStorage.getItem(key) || '[]'); } catch { saved = []; }
+  if (!saved.includes(evId)) saved.push(evId);
+  localStorage.setItem(key, JSON.stringify(saved));
+  renderCalendarPage();
+  showToast(`Đã đặt nhắc lịch: ${ev.title} (${ev.day} ${ev.month})`, '📅');
 }
 
 function renderOfficialsPage() {
@@ -1374,6 +1380,23 @@ function copyShareLink() {
   } else {
     showToast('Hãy sao chép link trên thanh địa chỉ trình duyệt.', 'ℹ️');
   }
+}
+
+async function shareSiteNative() {
+  const url = window.location.href;
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: 'Thôn An Sơn Thông Minh • Xã Cam Lộ, Quảng Trị',
+        text: 'Mời bà con truy cập Cổng thông tin Thôn An Sơn Thông Minh để xem thông báo, lịch thôn và liên hệ cán bộ:',
+        url
+      });
+      return;
+    } catch {
+      // Người dùng hủy chia sẻ hoặc trình duyệt từ chối -> chuyển sang copy link
+    }
+  }
+  copyShareLink();
 }
 
 function openSubscribeModal() { document.getElementById('modal-subscribe')?.classList.remove('hidden'); }
