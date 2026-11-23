@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
   <title>Thôn An Sơn Thông Minh • Xã Cam Lộ, Tỉnh Quảng Trị</title>
   <meta name="description" content="Cổng thông tin Thôn An Sơn Thông Minh - Xã Cam Lộ, Tỉnh Quảng Trị. Tra cứu thông báo, lịch âm dương, lịch thôn, danh bạ cán bộ, chợ quê OCOP và gửi phản ánh kiến nghị." />
+  <meta property="og:title" content="Thôn An Sơn Thông Minh • Xã Cam Lộ, Tỉnh Quảng Trị" />
+  <meta property="og:description" content="Thông tin nhanh chóng – Kết nối cộng đồng – Dễ dùng trên điện thoại & máy tính cho mọi bà con Thôn An Sơn." />
+  <meta property="og:type" content="website" />
   <meta name="theme-color" content="#059669" />
   <link rel="manifest" href="manifest.json" />
 
@@ -296,9 +299,14 @@
 
     <!-- ==================== 5. CÁN BỘ & ĐƯỜNG DÂY NÓNG ==================== -->
     <section id="view-officials" class="view-section hidden space-y-5">
-      <div>
-        <h2 class="text-xl font-extrabold text-slate-900">👥 Ban Cán Sự Thôn & Đường Dây Nóng</h2>
-        <p class="text-sm text-slate-600">Bấm nút <strong>Gọi ngay</strong> màu xanh để liên hệ trực tiếp bằng điện thoại.</p>
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 class="text-xl font-extrabold text-slate-900">👥 Ban Cán Sự, Đoàn Thể Thôn An Sơn</h2>
+          <p class="text-sm text-slate-600">Bấm nút <strong>Gọi ngay</strong> hoặc <strong>Zalo</strong> để liên hệ trực tiếp cán bộ phụ trách.</p>
+        </div>
+        <input id="official-search" type="search" placeholder="Tìm tên hoặc chức vụ (vd: Trưởng thôn, Đoàn...)"
+          oninput="renderOfficialsPage()"
+          class="w-full sm:w-72 px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
       </div>
 
       <div id="officials-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
@@ -414,6 +422,11 @@
           <p class="text-sm text-slate-600">Kết nối tiêu thụ nông sản sạch, sản phẩm OCOP của bà con trong thôn — Gọi mua trực tiếp không qua trung gian.</p>
         </div>
       </div>
+      <div class="flex items-center gap-2 overflow-x-auto pb-1">
+        <button class="market-filter-btn px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold bg-emerald-600 text-white cursor-pointer shrink-0" onclick="setMarketFilter('all', this)">Tất cả</button>
+        <button class="market-filter-btn px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold bg-white border border-slate-300 text-slate-700 cursor-pointer shrink-0" onclick="setMarketFilter('OCOP', this)">⭐ Đặc sản OCOP</button>
+        <button class="market-filter-btn px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold bg-white border border-slate-300 text-slate-700 cursor-pointer shrink-0" onclick="setMarketFilter('Tươi sống', this)">🥬 Thực phẩm tươi</button>
+      </div>
       <div id="market-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
     </section>
 
@@ -475,6 +488,15 @@
             </ol>
           </div>
         </div>
+      </div>
+
+      <!-- Cẩm nang Thủ tục hành chính phổ biến cho bà con -->
+      <div class="civic-card p-5 space-y-3">
+        <div>
+          <h3 class="text-base sm:text-lg font-extrabold text-slate-900">📄 Cẩm nang Thủ tục Hành chính phổ biến</h3>
+          <p class="text-xs sm:text-sm text-slate-600">Giúp bà con chuẩn bị đủ giấy tờ trước khi ra UBND Xã Cam Lộ, tránh đi lại nhiều lần.</p>
+        </div>
+        <div id="procedures-list" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
       </div>
     </section>
 
@@ -668,19 +690,37 @@
           </button>
         </form>
 
+        <!-- Form đăng tin tức mới -->
+        <form onsubmit="adminAddNews(event)" class="space-y-2.5 border-b border-slate-200 pb-4">
+          <h4 class="text-sm font-extrabold text-slate-900">📰 Đăng tin tức & Gương sáng</h4>
+          <input id="adm-news-title" type="text" required placeholder="Tiêu đề bài viết..."
+            class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm" />
+          <input id="adm-news-tag" type="text" value="Tin thôn An Sơn" placeholder="Chủ đề (vd: Nông thôn mới, Gương sáng)"
+            class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm" />
+          <textarea id="adm-news-summary" rows="2" required placeholder="Tóm tắt nội dung tin tức..."
+            class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm"></textarea>
+          <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 rounded-xl text-sm cursor-pointer">
+            ➕ Đăng tin tức
+          </button>
+        </form>
+
         <!-- Danh sách bà con đã đăng ký -->
         <div class="space-y-2 border-b border-slate-200 pb-4">
           <h4 class="text-sm font-extrabold text-slate-900">📋 Bà con đăng ký nhận tin (<span id="adm-sub-count">0</span>)</h4>
           <div id="adm-sub-list" class="max-h-32 overflow-y-auto space-y-1.5 text-xs"></div>
         </div>
 
-        <!-- Sao lưu dữ liệu -->
+        <!-- Sao lưu & Khôi phục dữ liệu -->
         <div class="flex flex-wrap gap-2">
           <button onclick="exportBackupData()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs py-2.5 px-3 rounded-xl cursor-pointer">
-            💾 Tải file sao lưu (JSON)
+            💾 Tải sao lưu (JSON)
           </button>
-          <button onclick="resetDemoData()" class="bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs py-2.5 px-3 rounded-xl cursor-pointer">
-            🔄 Khôi phục dữ liệu mẫu
+          <label class="flex-1 text-center bg-sky-50 hover:bg-sky-100 text-sky-800 font-bold text-xs py-2.5 px-3 rounded-xl cursor-pointer">
+            📂 Nhập sao lưu
+            <input type="file" accept=".json,application/json" onchange="importBackupData(this)" class="hidden" />
+          </label>
+          <button onclick="resetDemoData()" class="w-full bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs py-2 px-3 rounded-xl cursor-pointer">
+            🔄 Khôi phục dữ liệu mẫu ban đầu
           </button>
         </div>
       </div>

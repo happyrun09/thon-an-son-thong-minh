@@ -1,19 +1,20 @@
 /* ==========================================================================
-   THÔN AN SƠN THÔNG MINH - LOGIC ỨNG DỤNG V2.0 (NÂNG CẤP TOÀN DIỆN)
+   THÔN AN SƠN THÔNG MINH - LOGIC ỨNG DỤNG V3.0 (HOÀN THIỆN THỰC TẾ)
+   - Dữ liệu chính xác 7 Cán bộ, Đoàn thể Thôn An Sơn
    - PWA Offline-First (Service Worker + Manifest)
-   - Lịch Âm Dương Việt Nam (Thuật toán thiên văn Hồ Ngọc Đức)
-   - Loa Truyền Thanh Số (Text-to-Speech tiếng Việt)
-   - Chợ Quê OCOP An Sơn - Cam Lộ
-   - Phản ánh hiện trường kèm ảnh nén Canvas & Theo dõi tiến độ minh bạch
+   - Lịch Âm Dương Việt Nam (Thuật toán thiên văn TS. Hồ Ngọc Đức)
+   - Loa Truyền Thanh Số, Cẩm nang Thủ tục Hành chính, Chợ Quê OCOP
+   - Phản ánh hiện trường kèm ảnh nén & Quản trị đầy đủ (Thêm/Xóa/Sao lưu/Khôi phục)
    ========================================================================== */
 
 const STORAGE_KEYS = {
-  NOTICES: 'anson_smart_notices_v2',
-  EVENTS: 'anson_smart_events_v2',
-  FEEDBACKS: 'anson_smart_feedbacks_v2',
-  SUBSCRIBERS: 'anson_smart_subscribers_v2',
-  FONT_SCALE: 'anson_smart_font_scale_v2',
-  ADMIN_AUTH: 'anson_smart_admin_auth_v2'
+  NOTICES: 'anson_smart_notices_v3',
+  NEWS: 'anson_smart_news_v3',
+  EVENTS: 'anson_smart_events_v3',
+  FEEDBACKS: 'anson_smart_feedbacks_v3',
+  SUBSCRIBERS: 'anson_smart_subscribers_v3',
+  FONT_SCALE: 'anson_smart_font_scale_v3',
+  ADMIN_AUTH: 'anson_smart_admin_auth_v3'
 };
 
 const DEFAULT_NOTICES = [
@@ -61,7 +62,7 @@ const DEFAULT_NEWS = [
     tag: 'Chuyển đổi số',
     date: '22/11/2026',
     title: 'Thôn An Sơn đưa vào vận hành Cổng thông tin Thôn Thông Minh phục vụ bà con',
-    summary: 'Chỉ cần quét mã QR bằng Zalo hoặc mở trên điện thoại, bà con dễ dàng xem thông báo, lịch âm dương, lịch họp, gọi điện cho cán bộ thôn và gửi phản ánh kiến nghị mọi lúc mọi nơi.'
+    summary: 'Chỉ cần quét mã QR bằng Zalo hoặc mở trên điện thoại, bà con dễ dàng xem thông báo, lịch âm dương, lịch họp, gọi điện cho 7 cán bộ thôn và gửi phản ánh kiến nghị mọi lúc mọi nơi.'
   },
   {
     id: 'news2',
@@ -118,48 +119,70 @@ const DEFAULT_EVENTS = [
   }
 ];
 
+// DANH SÁCH CHÍNH THỨC CÁN BỘ, ĐOÀN THỂ THÔN AN SƠN (XÃ CAM LỘ, QUẢNG TRỊ)
 const OFFICIALS_DATA = [
   {
-    role: 'Trưởng thôn An Sơn',
-    name: 'Ông Nguyễn Văn Hùng',
-    duty: 'Điều hành chung, xác nhận giấy tờ thôn, giải quyết kiến nghị dân sinh',
-    phone: '0912345601',
-    badge: 'Lãnh đạo thôn'
-  },
-  {
-    role: 'Bí thư Chi bộ Thôn',
-    name: 'Ông Lê Văn Minh',
-    duty: 'Công tác Đảng, định hướng phong trào Nông thôn mới kiểu mẫu',
-    phone: '0912345602',
+    stt: 1,
+    name: 'Ông Nguyễn Văn Thon',
+    role: 'Bí thư Chi bộ',
+    duty: 'Lãnh đạo toàn diện công tác Đảng và phong trào xây dựng Thôn An Sơn kiểu mẫu',
+    phone: '0905487333',
+    phoneDisplay: '0905 487 333',
     badge: 'Chi bộ'
   },
   {
-    role: 'Bí thư Chi đoàn Thôn',
-    name: 'Đ/c Nguyễn Anh Hào',
-    duty: 'Tổ Công nghệ số cộng đồng, hoạt động thanh niên, hỗ trợ chuyển đổi số',
-    phone: '0912345603',
+    stt: 2,
+    name: 'Ông Nguyễn Trưng Vương',
+    role: 'Phó Bí thư Chi bộ, Trưởng thôn',
+    duty: 'Điều hành công việc chung của thôn, xác nhận dân cư, giải quyết kiến nghị bà con',
+    phone: '0915713393',
+    phoneDisplay: '0915 713 393',
+    badge: 'Trưởng thôn'
+  },
+  {
+    stt: 3,
+    name: 'Bà Mai Thị Vân Anh',
+    role: 'Trưởng ban Công tác Mặt trận',
+    duty: 'Vận động đoàn kết toàn dân, công tác an sinh xã hội, hỗ trợ hộ khó khăn',
+    phone: '0372850580',
+    phoneDisplay: '0372 850 580',
+    badge: 'Mặt trận'
+  },
+  {
+    stt: 4,
+    name: 'Ông Lê Văn Diện',
+    role: 'Chi hội trưởng Nông dân',
+    duty: 'Hỗ trợ kỹ thuật trồng trọt, chăn nuôi, giống cây trồng và vốn vay nông nghiệp',
+    phone: '0397074718',
+    phoneDisplay: '0397 074 718',
+    badge: 'Nông dân'
+  },
+  {
+    stt: 5,
+    name: 'Bà Võ Thị Thanh Nga',
+    role: 'Chi hội trưởng Phụ nữ',
+    duty: 'Phong trào 5 không 3 sạch, vệ sinh môi trường, tín dụng tiết kiệm hội viên',
+    phone: '0365064791',
+    phoneDisplay: '0365 064 791',
+    badge: 'Phụ nữ'
+  },
+  {
+    stt: 6,
+    name: 'Ông Nguyễn Anh Hào',
+    role: 'Bí thư Chi đoàn',
+    duty: 'Công tác thanh niên, Tổ Công nghệ số cộng đồng, hỗ trợ VNeID & chuyển đổi số',
+    phone: '0399985230',
+    phoneDisplay: '0399 985 230',
     badge: 'Đoàn thanh niên'
   },
   {
-    role: 'Công an viên phụ trách địa bàn',
-    name: 'Đ/c Trần Quốc Bảo',
-    duty: 'An ninh trật tự, tạm trú tạm vắng, hỗ trợ VNeID',
-    phone: '0912345604',
-    badge: 'An ninh'
-  },
-  {
-    role: 'Y tế thôn bản',
-    name: 'Bà Phạm Thị Hoa',
-    duty: 'Tư vấn sức khỏe ban đầu, lịch tiêm chủng, phòng chống dịch bệnh',
-    phone: '0912345605',
-    badge: 'Y tế'
-  },
-  {
-    role: 'Chi hội Trưởng Phụ nữ',
-    name: 'Bà Hoàng Thị Lan',
-    duty: 'Vệ sinh môi trường, phân loại rác tại nguồn, vốn vay hội viên',
-    phone: '0912345606',
-    badge: 'Đoàn thể'
+    stt: 7,
+    name: 'Ông Nguyễn Hữu Thọ',
+    role: 'Tổ trưởng Tổ bảo vệ an ninh, trật tự',
+    duty: 'Giữ gìn an ninh trật tự thôn xóm, tuần tra đêm, tiếp nhận tin báo an ninh',
+    phone: '0358390113',
+    phoneDisplay: '0358 390 113',
+    badge: 'An ninh trật tự'
   }
 ];
 
@@ -192,6 +215,7 @@ const MARKET_DATA = [
   {
     id: 'm1',
     icon: '🌿',
+    category: 'OCOP',
     tag: 'OCOP Cam Lộ',
     name: 'Cao Chè Vằng An Sơn nguyên chất',
     price: '120.000đ / hộp 500g',
@@ -202,6 +226,7 @@ const MARKET_DATA = [
   {
     id: 'm2',
     icon: '🌶️',
+    category: 'OCOP',
     tag: 'Đặc sản địa phương',
     name: 'Hồ Tiêu đen phơi nắng tự nhiên',
     price: '165.000đ / kg',
@@ -212,7 +237,8 @@ const MARKET_DATA = [
   {
     id: 'm3',
     icon: '🍯',
-    tag: 'Nông sản sạch',
+    category: 'OCOP',
+    tag: 'OCOP Quảng Trị',
     name: 'Mật ong hoa rừng Cam Lộ',
     price: '250.000đ / chai 750ml',
     seller: 'Anh Bình (Đội 3)',
@@ -222,6 +248,7 @@ const MARKET_DATA = [
   {
     id: 'm4',
     icon: '🐔',
+    category: 'Tươi sống',
     tag: 'Thực phẩm tươi',
     name: 'Gà đồi thả vườn An Sơn',
     price: '135.000đ / kg',
@@ -232,6 +259,7 @@ const MARKET_DATA = [
   {
     id: 'm5',
     icon: '🥬',
+    category: 'Tươi sống',
     tag: 'Rau an toàn',
     name: 'Rau xanh theo mùa (Cải, Mồng tơi, Đậu)',
     price: '15.000đ - 25.000đ / kg',
@@ -242,7 +270,8 @@ const MARKET_DATA = [
   {
     id: 'm6',
     icon: '🍄',
-    tag: 'Nông sản sạch',
+    category: 'Tươi sống',
+    tag: 'Nấm sạch',
     name: 'Nấm bào ngư xám tươi',
     price: '55.000đ / kg',
     seller: 'Trại nấm anh Dũng (Đội 2)',
@@ -251,7 +280,39 @@ const MARKET_DATA = [
   }
 ];
 
+const PROCEDURES_DATA = [
+  {
+    id: 'p1',
+    title: 'Đăng ký Khai sinh cho trẻ',
+    docs: 'CCCD của cha/mẹ, Giấy chứng sinh bản chính, Giấy đăng ký kết hôn (nếu có).',
+    place: 'UBND Xã Cam Lộ hoặc nộp online trên Cổng Dịch vụ công.',
+    time: 'Giải quyết trong ngày làm việc.'
+  },
+  {
+    id: 'p2',
+    title: 'Chứng thực chữ ký / Bản sao y',
+    docs: 'Bản chính giấy tờ cần sao y + CCCD bản chính (hoặc VNeID mức 2).',
+    place: 'Bộ phận Một cửa UBND Xã Cam Lộ.',
+    time: 'Nhận kết quả ngay trong buổi.'
+  },
+  {
+    id: 'p3',
+    title: 'Đăng ký Thường trú / Tạm trú',
+    docs: 'CCCD, Giấy tờ chứng minh chỗ ở hợp pháp (Sổ đỏ hoặc xác nhận chủ hộ).',
+    place: 'Nộp trực tuyến qua ứng dụng VNeID hoặc Công an Xã Cam Lộ.',
+    time: '3 - 7 ngày làm việc.'
+  },
+  {
+    id: 'p4',
+    title: 'Xác nhận tình trạng hôn nhân / Giấy tờ thôn',
+    docs: 'CCCD, đơn đề nghị xác nhận theo mẫu (liên hệ Trưởng thôn Nguyễn Trưng Vương).',
+    place: 'Nhà văn hóa Thôn An Sơn & UBND Xã Cam Lộ.',
+    time: '1 - 3 ngày làm việc.'
+  }
+];
+
 let currentNoticeFilter = 'all';
+let currentMarketFilter = 'all';
 let currentSpeakingId = null;
 let pendingFeedbackPhoto = '';
 let deferredInstallPrompt = null;
@@ -449,6 +510,9 @@ function initStorageDefaults() {
   if (!localStorage.getItem(STORAGE_KEYS.NOTICES)) {
     localStorage.setItem(STORAGE_KEYS.NOTICES, JSON.stringify(DEFAULT_NOTICES));
   }
+  if (!localStorage.getItem(STORAGE_KEYS.NEWS)) {
+    localStorage.setItem(STORAGE_KEYS.NEWS, JSON.stringify(DEFAULT_NEWS));
+  }
   if (!localStorage.getItem(STORAGE_KEYS.EVENTS)) {
     localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(DEFAULT_EVENTS));
   }
@@ -462,6 +526,9 @@ function initStorageDefaults() {
 
 function getNotices() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.NOTICES)) || DEFAULT_NOTICES; } catch { return DEFAULT_NOTICES; }
+}
+function getNews() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.NEWS)) || DEFAULT_NEWS; } catch { return DEFAULT_NEWS; }
 }
 function getEvents() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.EVENTS)) || DEFAULT_EVENTS; } catch { return DEFAULT_EVENTS; }
@@ -520,7 +587,7 @@ function applyFontScale() {
 }
 
 // ==========================================================================
-// NGHE ĐỌC TIẾNG VIỆT (TÁCH SẠCH KHỎI INLINE STRING ĐỂ TRÁNH LỖI)
+// NGHE ĐỌC TIẾNG VIỆT
 // ==========================================================================
 function speakById(type, id, btnElement) {
   let text = '';
@@ -528,8 +595,11 @@ function speakById(type, id, btnElement) {
     const item = getNotices().find(n => n.id === id);
     if (item) text = `${item.title}. ${item.body}`;
   } else if (type === 'news') {
-    const item = DEFAULT_NEWS.find(n => n.id === id);
+    const item = getNews().find(n => n.id === id);
     if (item) text = `${item.title}. ${item.summary}`;
+  } else if (type === 'proc') {
+    const item = PROCEDURES_DATA.find(p => p.id === id);
+    if (item) text = `${item.title}. Hồ sơ cần chuẩn bị: ${item.docs}. Nơi nộp: ${item.place}. Thời gian: ${item.time}`;
   }
   if (!text) return;
   runSpeech(`${type}-${id}`, text, btnElement, '🔊 Nghe đọc');
@@ -595,6 +665,7 @@ function renderAll() {
   renderOfficialsPage();
   renderFeedbackPage();
   renderMarketPage();
+  renderProceduresList();
 }
 
 function getLevelBadgeClass(level) {
@@ -650,13 +721,14 @@ function renderHome() {
     `).join('');
   }
 
+  // 3 Lãnh đạo chủ chốt đầu tiên trên Trang chủ
   const contactBox = document.getElementById('home-quick-contacts');
   if (contactBox) {
     contactBox.innerHTML = OFFICIALS_DATA.slice(0, 3).map(of => `
       <div class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
         <div class="min-w-0">
-          <div class="text-xs font-bold text-emerald-700 uppercase">${escapeHtml(of.role)}</div>
-          <div class="text-sm font-bold text-slate-900 truncate">${escapeHtml(of.name)}</div>
+          <div class="text-xs font-bold text-emerald-700 uppercase truncate">${escapeHtml(of.role)}</div>
+          <div class="text-sm font-bold text-slate-900 truncate">${escapeHtml(of.name)} • <span class="font-mono text-xs text-slate-600">${of.phoneDisplay}</span></div>
         </div>
         <a href="tel:${of.phone}"
           class="shrink-0 inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition">
@@ -679,6 +751,7 @@ function setNoticeFilter(cat, btn) {
 function renderNoticesPage() {
   const notices = getNotices();
   const query = (document.getElementById('notice-search')?.value || '').trim().toLowerCase();
+  const adminMode = isAdmin();
 
   const filtered = notices.filter(n => {
     const matchCat = currentNoticeFilter === 'all' || n.level === currentNoticeFilter;
@@ -703,6 +776,12 @@ function renderNoticesPage() {
       <h3 class="text-base sm:text-lg font-extrabold text-slate-900">${escapeHtml(n.title)}</h3>
       <p class="text-sm sm:text-base text-slate-700 leading-relaxed">${escapeHtml(n.body)}</p>
       <div class="pt-2 flex items-center justify-end gap-2">
+        ${adminMode ? `
+          <button onclick="adminDeleteItem('notice', '${escapeHtml(n.id)}')"
+            class="text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-xl transition cursor-pointer">
+            🗑️ Xóa
+          </button>
+        ` : ''}
         <button onclick="speakById('notice', '${escapeHtml(n.id)}', this)"
           class="btn-speak text-xs sm:text-sm font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-3.5 py-2 rounded-xl transition cursor-pointer">
           🔊 Nghe đọc
@@ -715,7 +794,8 @@ function renderNoticesPage() {
 function renderNewsPage() {
   const el = document.getElementById('news-list');
   if (!el) return;
-  el.innerHTML = DEFAULT_NEWS.map(item => `
+  const adminMode = isAdmin();
+  el.innerHTML = getNews().map(item => `
     <article class="civic-card civic-card-hover p-5 space-y-2.5 flex flex-col justify-between">
       <div class="space-y-2">
         <div class="flex items-center justify-between text-xs">
@@ -725,11 +805,17 @@ function renderNewsPage() {
         <h3 class="text-base sm:text-lg font-extrabold text-slate-900 leading-snug">${escapeHtml(item.title)}</h3>
         <p class="text-sm text-slate-600 leading-relaxed">${escapeHtml(item.summary)}</p>
       </div>
-      <div class="pt-2">
+      <div class="pt-2 flex items-center justify-between gap-2">
         <button onclick="speakById('news', '${escapeHtml(item.id)}', this)"
           class="btn-speak text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition cursor-pointer">
           🔊 Nghe đọc
         </button>
+        ${adminMode ? `
+          <button onclick="adminDeleteItem('news', '${escapeHtml(item.id)}')"
+            class="text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 px-2.5 py-1.5 rounded-lg cursor-pointer">
+            🗑️ Xóa
+          </button>
+        ` : ''}
       </div>
     </article>
   `).join('');
@@ -738,6 +824,7 @@ function renderNewsPage() {
 function renderCalendarPage() {
   const el = document.getElementById('calendar-list');
   if (!el) return;
+  const adminMode = isAdmin();
   el.innerHTML = getEvents().map(ev => `
     <div class="civic-card p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div class="flex items-start sm:items-center gap-4">
@@ -754,10 +841,18 @@ function renderCalendarPage() {
           <div class="text-xs text-emerald-700 font-semibold">👥 ${escapeHtml(ev.audience || 'Toàn thể bà con')}</div>
         </div>
       </div>
-      <button onclick="saveEventReminder('${escapeHtml(ev.id)}')"
-        class="shrink-0 px-4 py-2 rounded-xl bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 text-xs font-bold transition cursor-pointer">
-        🔔 Nhắc tôi
-      </button>
+      <div class="flex items-center gap-2 shrink-0">
+        <button onclick="saveEventReminder('${escapeHtml(ev.id)}')"
+          class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 text-xs font-bold transition cursor-pointer">
+          🔔 Nhắc tôi
+        </button>
+        ${adminMode ? `
+          <button onclick="adminDeleteItem('event', '${escapeHtml(ev.id)}')"
+            class="px-3 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold cursor-pointer">
+            🗑️
+          </button>
+        ` : ''}
+      </div>
     </div>
   `).join('');
 }
@@ -771,14 +866,29 @@ function saveEventReminder(evId) {
 function renderOfficialsPage() {
   const el = document.getElementById('officials-list');
   if (!el) return;
-  el.innerHTML = OFFICIALS_DATA.map(of => `
-    <div class="civic-card p-5 flex flex-col justify-between gap-4">
+  const query = (document.getElementById('official-search')?.value || '').trim().toLowerCase();
+
+  const list = OFFICIALS_DATA.filter(of => {
+    if (!query) return true;
+    return of.name.toLowerCase().includes(query) || of.role.toLowerCase().includes(query) || of.duty.toLowerCase().includes(query);
+  });
+
+  if (list.length === 0) {
+    el.innerHTML = `<div class="col-span-full civic-card p-8 text-center text-slate-500 text-sm">Không tìm thấy cán bộ phù hợp.</div>`;
+    return;
+  }
+
+  el.innerHTML = list.map(of => `
+    <div class="civic-card civic-card-hover p-5 flex flex-col justify-between gap-4">
       <div class="space-y-1.5">
         <div class="flex items-center justify-between gap-2">
-          <span class="badge badge-normal">${escapeHtml(of.badge)}</span>
-          <span class="text-xs font-mono text-slate-500">${of.phone}</span>
+          <span class="badge badge-normal">${of.stt}. ${escapeHtml(of.badge)}</span>
+          <button onclick="copyPhone('${of.phone}', '${escapeHtml(of.phoneDisplay)}')" title="Sao chép số điện thoại"
+            class="text-xs font-mono font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-lg cursor-pointer transition">
+            📋 ${of.phoneDisplay}
+          </button>
         </div>
-        <h3 class="text-base sm:text-lg font-extrabold text-slate-900">${escapeHtml(of.name)}</h3>
+        <h3 class="text-base sm:text-lg font-extrabold text-slate-900 pt-1">${escapeHtml(of.name)}</h3>
         <div class="text-xs font-bold text-emerald-700 uppercase">${escapeHtml(of.role)}</div>
         <p class="text-xs sm:text-sm text-slate-600 pt-1">${escapeHtml(of.duty)}</p>
       </div>
@@ -794,6 +904,16 @@ function renderOfficialsPage() {
       </div>
     </div>
   `).join('');
+}
+
+function copyPhone(phone, display) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(phone).then(() => {
+      showToast(`Đã sao chép số: ${display}`, '📋');
+    }).catch(() => showToast(`Số điện thoại: ${display}`, '📞'));
+  } else {
+    showToast(`Số điện thoại: ${display}`, '📞');
+  }
 }
 
 function renderFeedbackPage() {
@@ -830,7 +950,10 @@ function renderFeedbackPage() {
           </div>
         ` : ''}
         ${adminMode ? `
-          <div class="pt-2 border-t border-slate-100 flex justify-end">
+          <div class="pt-2 border-t border-slate-100 flex justify-end gap-2">
+            <button onclick="adminDeleteItem('feedback', '${escapeHtml(fb.id)}')" class="text-xs font-bold px-2.5 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 cursor-pointer">
+              🗑️ Xóa
+            </button>
             <button onclick="openReplyModal('${escapeHtml(fb.id)}')" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 cursor-pointer">
               ✏️ Cập nhật & Trả lời
             </button>
@@ -841,10 +964,20 @@ function renderFeedbackPage() {
   }).join('');
 }
 
+function setMarketFilter(cat, btn) {
+  currentMarketFilter = cat;
+  document.querySelectorAll('.market-filter-btn').forEach(b => {
+    b.className = 'market-filter-btn px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold bg-white border border-slate-300 text-slate-700 cursor-pointer shrink-0';
+  });
+  btn.className = 'market-filter-btn px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold bg-emerald-600 text-white cursor-pointer shrink-0';
+  renderMarketPage();
+}
+
 function renderMarketPage() {
   const el = document.getElementById('market-list');
   if (!el) return;
-  el.innerHTML = MARKET_DATA.map(item => `
+  const items = MARKET_DATA.filter(m => currentMarketFilter === 'all' || m.category === currentMarketFilter);
+  el.innerHTML = items.map(item => `
     <div class="civic-card civic-card-hover p-5 flex flex-col justify-between gap-3">
       <div class="space-y-2">
         <div class="flex items-center justify-between">
@@ -863,6 +996,27 @@ function renderMarketPage() {
         <a href="https://zalo.me/${item.phone}" target="_blank" rel="noopener" class="px-3.5 py-2.5 bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 font-bold text-xs sm:text-sm rounded-xl transition">
           💬 Zalo
         </a>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderProceduresList() {
+  const el = document.getElementById('procedures-list');
+  if (!el) return;
+  el.innerHTML = PROCEDURES_DATA.map(p => `
+    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2 flex flex-col justify-between">
+      <div class="space-y-1">
+        <h4 class="text-sm sm:text-base font-extrabold text-slate-900">📌 ${escapeHtml(p.title)}</h4>
+        <p class="text-xs sm:text-sm text-slate-700"><strong>Giấy tờ:</strong> ${escapeHtml(p.docs)}</p>
+        <p class="text-xs text-slate-600"><strong>Nơi làm:</strong> ${escapeHtml(p.place)}</p>
+        <p class="text-xs font-semibold text-emerald-700">⏱️ ${escapeHtml(p.time)}</p>
+      </div>
+      <div class="pt-1">
+        <button onclick="speakById('proc', '${p.id}', this)"
+          class="btn-speak text-xs font-bold text-emerald-700 bg-emerald-100/70 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition cursor-pointer">
+          🔊 Nghe đọc
+        </button>
       </div>
     </div>
   `).join('');
@@ -933,7 +1087,6 @@ function submitFeedback(e) {
   try {
     localStorage.setItem(STORAGE_KEYS.FEEDBACKS, JSON.stringify(feedbacks));
   } catch {
-    // Nếu bộ nhớ đầy do nhiều ảnh, bỏ ảnh của phản ánh mới để vẫn lưu được nội dung
     feedbacks[0].photo = '';
     localStorage.setItem(STORAGE_KEYS.FEEDBACKS, JSON.stringify(feedbacks));
   }
@@ -962,7 +1115,7 @@ function submitSubscribe(e) {
 }
 
 // ==========================================================================
-// BAN QUẢN TRỊ & SAO LƯU DỮ LIỆU
+// BAN QUẢN TRỊ: THÊM, XÓA, SAO LƯU & KHÔI PHỤC
 // ==========================================================================
 function verifyAdminPin() {
   const pin = document.getElementById('admin-pin-input').value.trim();
@@ -970,7 +1123,7 @@ function verifyAdminPin() {
     localStorage.setItem(STORAGE_KEYS.ADMIN_AUTH, 'true');
     document.getElementById('admin-pin-input').value = '';
     updateAdminUI();
-    renderFeedbackPage();
+    renderAll();
     showToast('Đăng nhập Ban Quản Trị thành công!', '🛡️');
   } else {
     showToast('Mã PIN chưa đúng (Mặc định dùng thử: 1234)', '⚠️');
@@ -980,7 +1133,7 @@ function verifyAdminPin() {
 function logoutAdmin() {
   localStorage.removeItem(STORAGE_KEYS.ADMIN_AUTH);
   updateAdminUI();
-  renderFeedbackPage();
+  renderAll();
   showToast('Đã thoát chế độ Ban Quản Trị.', '👋');
 }
 
@@ -1066,6 +1219,50 @@ function adminAddEvent(e) {
   showToast('Đã thêm sự kiện mới vào Lịch thôn!', '📅');
 }
 
+function adminAddNews(e) {
+  e.preventDefault();
+  const title = document.getElementById('adm-news-title').value.trim();
+  const tag = document.getElementById('adm-news-tag').value.trim() || 'Tin thôn An Sơn';
+  const summary = document.getElementById('adm-news-summary').value.trim();
+  if (!title || !summary) return;
+
+  const now = new Date();
+  const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+
+  const news = getNews();
+  news.unshift({ id: 'news-' + Date.now(), tag, date: dateStr, title, summary });
+  localStorage.setItem(STORAGE_KEYS.NEWS, JSON.stringify(news));
+
+  e.target.reset();
+  closeModal('modal-admin');
+  renderNewsPage();
+  showToast('Đã đăng tin tức mới!', '📰');
+}
+
+function adminDeleteItem(type, id) {
+  if (!isAdmin()) return;
+  if (type === 'notice') {
+    const list = getNotices().filter(i => i.id !== id);
+    localStorage.setItem(STORAGE_KEYS.NOTICES, JSON.stringify(list));
+    renderHome();
+    renderNoticesPage();
+  } else if (type === 'news') {
+    const list = getNews().filter(i => i.id !== id);
+    localStorage.setItem(STORAGE_KEYS.NEWS, JSON.stringify(list));
+    renderNewsPage();
+  } else if (type === 'event') {
+    const list = getEvents().filter(i => i.id !== id);
+    localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(list));
+    renderHome();
+    renderCalendarPage();
+  } else if (type === 'feedback') {
+    const list = getFeedbacks().filter(i => i.id !== id);
+    localStorage.setItem(STORAGE_KEYS.FEEDBACKS, JSON.stringify(list));
+    renderFeedbackPage();
+  }
+  showToast('Đã xóa mục đã chọn.', '🗑️');
+}
+
 function openReplyModal(fbId) {
   const fb = getFeedbacks().find(f => f.id === fbId);
   if (!fb) return;
@@ -1101,6 +1298,7 @@ function exportBackupData() {
   const data = {
     exportedAt: new Date().toISOString(),
     notices: getNotices(),
+    news: getNews(),
     events: getEvents(),
     feedbacks: getFeedbacks(),
     subscribers: getSubscribers()
@@ -1114,8 +1312,32 @@ function exportBackupData() {
   showToast('Đã tải file sao lưu dữ liệu!', '💾');
 }
 
+function importBackupData(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (Array.isArray(data.notices)) localStorage.setItem(STORAGE_KEYS.NOTICES, JSON.stringify(data.notices));
+      if (Array.isArray(data.news)) localStorage.setItem(STORAGE_KEYS.NEWS, JSON.stringify(data.news));
+      if (Array.isArray(data.events)) localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(data.events));
+      if (Array.isArray(data.feedbacks)) localStorage.setItem(STORAGE_KEYS.FEEDBACKS, JSON.stringify(data.feedbacks));
+      if (Array.isArray(data.subscribers)) localStorage.setItem(STORAGE_KEYS.SUBSCRIBERS, JSON.stringify(data.subscribers));
+      renderAll();
+      updateAdminUI();
+      showToast('Đã khôi phục dữ liệu từ file sao lưu!', '📂');
+    } catch {
+      showToast('File sao lưu không hợp lệ.', '⚠️');
+    }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
 function resetDemoData() {
   localStorage.setItem(STORAGE_KEYS.NOTICES, JSON.stringify(DEFAULT_NOTICES));
+  localStorage.setItem(STORAGE_KEYS.NEWS, JSON.stringify(DEFAULT_NEWS));
   localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(DEFAULT_EVENTS));
   localStorage.setItem(STORAGE_KEYS.FEEDBACKS, JSON.stringify(DEFAULT_FEEDBACKS));
   renderAll();
